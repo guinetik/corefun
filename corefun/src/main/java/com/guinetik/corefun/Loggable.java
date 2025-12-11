@@ -8,10 +8,23 @@ import java.util.function.Consumer;
  * <p>
  * {@code Loggable} is framework-agnostic - implement {@link #logger()} to return
  * a {@link Logger} that delegates to your preferred logging framework (SLF4J, Log4j,
- * java.util.logging, etc.).
+ * java.util.logging, etc.). This allows library code to emit logs without depending
+ * on any specific logging implementation.
  * </p>
  *
- * <p>Example with SLF4J:</p>
+ * <h2>Design Philosophy</h2>
+ * <p>
+ * Rather than depending on a logging facade like SLF4J, CoreFun uses a simple
+ * functional approach: you provide the logging functions. This means:
+ * </p>
+ * <ul>
+ *   <li>Zero dependencies on logging frameworks</li>
+ *   <li>Easy integration with any logging system</li>
+ *   <li>Testable - inject mock loggers for testing</li>
+ *   <li>Flexible - use lambdas, method references, or custom implementations</li>
+ * </ul>
+ *
+ * <h2>Example with SLF4J</h2>
  * <pre>{@code
  * public class MyService implements Loggable {
  *     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(MyService.class);
@@ -29,7 +42,24 @@ import java.util.function.Consumer;
  * }
  * }</pre>
  *
- * <p>Example with simple println:</p>
+ * <h2>Example with java.util.logging</h2>
+ * <pre>{@code
+ * public class JulService implements Loggable {
+ *     private static final java.util.logging.Logger LOG =
+ *         java.util.logging.Logger.getLogger(JulService.class.getName());
+ *
+ *     @Override
+ *     public Logger logger() {
+ *         return Logger.of(
+ *             msg -> LOG.info(msg),
+ *             msg -> LOG.warning(msg),
+ *             msg -> LOG.severe(msg)
+ *         );
+ *     }
+ * }
+ * }</pre>
+ *
+ * <h2>Example with Simple println</h2>
  * <pre>{@code
  * public class SimpleService implements Loggable {
  *     @Override
@@ -38,6 +68,16 @@ import java.util.function.Consumer;
  *     }
  * }
  * }</pre>
+ *
+ * <h2>Tagged Logging</h2>
+ * <pre>{@code
+ * Logger tagged = Logger.tagged("MyComponent", Logger.println());
+ * tagged.info("Starting");  // prints: [MyComponent] Starting
+ * }</pre>
+ *
+ * @author Guinetik &lt;guinetik@gmail.com&gt;
+ * @since 0.1.0
+ * @see SafeExecutor
  */
 public interface Loggable {
 
@@ -51,6 +91,14 @@ public interface Loggable {
 
     /**
      * A simple, framework-agnostic logger interface.
+     * <p>
+     * Logger provides a minimal set of logging methods that can be implemented
+     * by delegating to any logging framework. Factory methods are provided for
+     * common use cases.
+     * </p>
+     *
+     * @author Guinetik &lt;guinetik@gmail.com&gt;
+     * @since 0.1.0
      */
     interface Logger {
 

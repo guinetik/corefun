@@ -9,20 +9,43 @@ import java.util.function.Supplier;
  * <p>
  * {@code Try} provides static methods for wrapping operations that might throw
  * exceptions and converting them to {@link Result} types for functional error handling.
+ * It bridges the gap between exception-based APIs and functional error handling.
  * </p>
  *
- * <p>Example usage:</p>
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li><b>Exception to Result conversion</b> - Wrap throwing operations in Results</li>
+ *   <li><b>Multiple error representations</b> - String messages, full Exceptions, or custom types</li>
+ *   <li><b>Lazy evaluation</b> - Defer execution until result is needed</li>
+ *   <li><b>Safe defaults</b> - Execute with fallback values on failure</li>
+ * </ul>
+ *
+ * <h2>Example Usage</h2>
  * <pre>{@code
- * // Execute and get Result
+ * // Execute and get Result with string error
  * Result<String, String> content = Try.of(() -> Files.readString(path));
  *
- * // Chain operations
+ * // Chain operations - errors propagate automatically
  * Result<Integer, String> lineCount = Try.of(() -> Files.readString(path))
  *     .map(s -> s.split("\n").length);
  *
- * // With exception details
+ * // Keep full exception for detailed error handling
  * Result<User, Exception> user = Try.ofException(() -> userService.find(id));
+ *
+ * // Custom error mapping
+ * Result<Config, AppError> config = Try.of(
+ *     () -> loadConfig(path),
+ *     e -> new AppError("CONFIG_LOAD_FAILED", e)
+ * );
+ *
+ * // Safe execution with default
+ * int port = Try.getOrDefault(() -> Integer.parseInt(env), 8080);
  * }</pre>
+ *
+ * @author Guinetik &lt;guinetik@gmail.com&gt;
+ * @since 0.1.0
+ * @see Result
+ * @see SafeCallable
  */
 public final class Try {
 

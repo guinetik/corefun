@@ -11,7 +11,23 @@ import java.util.function.Consumer;
  * By default, it logs operation start, completion (with timing), and errors.
  * </p>
  *
- * <p>Example usage with SLF4J:</p>
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li><b>Automatic timing</b> - Every operation is timed and logged</li>
+ *   <li><b>Structured logging</b> - Consistent start/complete/error messages</li>
+ *   <li><b>Exception wrapping</b> - Checked exceptions wrapped in {@link SafeException}</li>
+ *   <li><b>Result support</b> - Use {@link #safelyResult} for functional error handling</li>
+ *   <li><b>Customizable hooks</b> - Override {@link #onStart}, {@link #onComplete}, {@link #onError}</li>
+ * </ul>
+ *
+ * <h2>Implementation Pattern</h2>
+ * <p>
+ * Implement this interface in service classes to get automatic logging and timing
+ * for all operations. The interface-with-default-methods pattern means you only need
+ * to implement {@link #logger()}.
+ * </p>
+ *
+ * <h2>Example with SLF4J</h2>
  * <pre>{@code
  * public class DataProcessor implements SafeExecutor {
  *     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(DataProcessor.class);
@@ -30,7 +46,7 @@ import java.util.function.Consumer;
  * }
  * }</pre>
  *
- * <p>Example with simple println:</p>
+ * <h2>Example with Simple println</h2>
  * <pre>{@code
  * public class SimpleProcessor implements SafeExecutor {
  *     @Override
@@ -45,6 +61,22 @@ import java.util.function.Consumer;
  *     }
  * }
  * }</pre>
+ *
+ * <h2>Result-Based Error Handling</h2>
+ * <pre>{@code
+ * Result<Data, String> result = safelyResult("Load data", () -> loadData());
+ * result.fold(
+ *     error -> showError(error),
+ *     data -> displayData(data)
+ * );
+ * }</pre>
+ *
+ * @author Guinetik &lt;guinetik@gmail.com&gt;
+ * @since 0.1.0
+ * @see Loggable
+ * @see Timing
+ * @see SafeException
+ * @see Result
  */
 public interface SafeExecutor extends Loggable {
 

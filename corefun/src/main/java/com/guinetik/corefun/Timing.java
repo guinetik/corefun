@@ -7,9 +7,18 @@ import java.util.concurrent.Callable;
  * <p>
  * {@code Timing} provides methods for measuring execution time with pluggable
  * logging. Implement {@link #onTimed(String, long)} to receive timing results.
+ * This is useful for performance monitoring, profiling, and debugging.
  * </p>
  *
- * <p>Example usage:</p>
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li><b>Automatic timing</b> - Execution time measured in milliseconds</li>
+ *   <li><b>Pluggable reporting</b> - Implement {@link #onTimed} for custom handling</li>
+ *   <li><b>Exception safe</b> - Timing reported even if operation throws</li>
+ *   <li><b>Multiple operation types</b> - Support for Callable, Runnable, SafeRunnable</li>
+ * </ul>
+ *
+ * <h2>Example Usage</h2>
  * <pre>{@code
  * public class MyService implements Timing {
  *     @Override
@@ -20,8 +29,26 @@ import java.util.concurrent.Callable;
  *     public User loadUser(long id) {
  *         return timed("Load user " + id, () -> userRepository.findById(id));
  *     }
+ *
+ *     public void sendNotification() {
+ *         timedVoid("Send notification", () -> notificationService.send());
+ *     }
  * }
  * }</pre>
+ *
+ * <h2>Metrics Collection</h2>
+ * <pre>{@code
+ * // Report to metrics system
+ * Timing metricsTimer = (desc, ms) ->
+ *     metrics.recordTiming("operation." + desc, ms, TimeUnit.MILLISECONDS);
+ *
+ * // Use the timer
+ * metricsTimer.timed("database.query", () -> db.execute(query));
+ * }</pre>
+ *
+ * @author Guinetik &lt;guinetik@gmail.com&gt;
+ * @since 0.1.0
+ * @see SafeExecutor
  */
 public interface Timing {
 

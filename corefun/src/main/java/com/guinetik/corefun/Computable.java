@@ -11,17 +11,47 @@ import java.util.function.Supplier;
  * <p>
  * {@code Computable} encapsulates a value and provides methods for transforming,
  * validating, and combining values in a functional style. It promotes immutability
- * and composability, making it useful for data processing pipelines.
+ * and composability, making it useful for data processing pipelines and building
+ * domain-specific languages (DSLs).
  * </p>
  *
- * <p>Example usage:</p>
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li><b>Immutable transformations</b> - All operations return new instances</li>
+ *   <li><b>Fluent API</b> - Chain operations for readable data pipelines</li>
+ *   <li><b>Validation</b> - Check values with predicates using {@link #isValid} and {@link #filter}</li>
+ *   <li><b>Combination</b> - Combine multiple values with {@link #combine}</li>
+ *   <li><b>Side effects</b> - Debug with {@link #peek} without breaking the chain</li>
+ * </ul>
+ *
+ * <h2>Example Usage</h2>
  * <pre>{@code
+ * // Simple transformation
  * Computable<String> name = Computable.of("hello");
  * Computable<Integer> length = name.map(String::length);
  * System.out.println(length.getValue()); // prints 5
+ *
+ * // Chained transformations
+ * String result = Computable.of(100)
+ *     .map(n -> n * 2)
+ *     .filter(n -> n > 0, () -> 0)
+ *     .map(n -> "Result: " + n)
+ *     .getValue();
+ *
+ * // Combining values
+ * Computable<Integer> a = Computable.of(10);
+ * Computable<Integer> b = Computable.of(5);
+ * int sum = a.combine(b, Integer::sum).getValue(); // 15
+ *
+ * // Validation
+ * boolean valid = Computable.of(email)
+ *     .isValid(e -> e.contains("@"));
  * }</pre>
  *
  * @param <T> the type of the value being managed
+ * @author Guinetik &lt;guinetik@gmail.com&gt;
+ * @since 0.1.0
+ * @see DefaultComputable
  */
 public interface Computable<T> {
 

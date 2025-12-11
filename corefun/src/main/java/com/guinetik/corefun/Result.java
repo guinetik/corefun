@@ -9,9 +9,20 @@ import java.util.function.Supplier;
  * <p>
  * {@code Result} is an Either-style monad that encapsulates either a successful value
  * or an error, providing a functional approach to error handling without exceptions.
+ * This eliminates the need for null checks and exception handling in business logic,
+ * promoting cleaner, more composable code.
  * </p>
  *
- * <p>Example usage:</p>
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li><b>Type-safe error handling</b> - Errors are part of the type signature</li>
+ *   <li><b>Functional composition</b> - Chain operations with {@link #map} and {@link #flatMap}</li>
+ *   <li><b>Pattern matching</b> - Use {@link #fold} to handle both cases uniformly</li>
+ *   <li><b>Validation support</b> - Combine with {@link #validate} for input validation</li>
+ *   <li><b>Recovery</b> - Handle failures gracefully with {@link #recover}</li>
+ * </ul>
+ *
+ * <h2>Example Usage</h2>
  * <pre>{@code
  * Result<User, String> result = findUser(id);
  *
@@ -25,10 +36,22 @@ import java.util.function.Supplier;
  * Result<String, String> greeting = result
  *     .map(user -> user.getName())
  *     .map(name -> "Hello, " + name);
+ *
+ * // Validation
+ * Result<Integer, String> validAge = Result.success(age)
+ *     .validate(a -> a >= 0 && a <= 150, a -> "Invalid age: " + a);
+ *
+ * // Recovery from errors
+ * Result<User, String> userOrGuest = findUser(id)
+ *     .recover(error -> Result.success(guestUser));
  * }</pre>
  *
  * @param <S> the type of the success value
  * @param <F> the type of the failure value
+ * @author Guinetik &lt;guinetik@gmail.com&gt;
+ * @since 0.1.0
+ * @see Try
+ * @see SafeCallable#toResult()
  */
 public abstract class Result<S, F> {
 

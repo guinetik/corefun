@@ -192,22 +192,6 @@ String message = switch (result) {
 };
 ```
 
-## Comparison with Vavr
-
-| Feature | CoreFun | Vavr |
-|---------|---------|------|
-| Size | ~30KB | ~1MB |
-| Dependencies | 0 | 0 |
-| Java version | 8+ | 8+ |
-| Result/Either | Yes | Yes |
-| Try | Yes | Yes |
-| Option | No (use Optional) | Yes |
-| Collections | No | Yes |
-| Pattern matching | fold() | fold() |
-| Sealed types (17+) | Yes (MRJAR) | No |
-
-CoreFun is intentionally minimal. If you need functional collections or more advanced FP features, consider Vavr.
-
 ## License
 
 Apache License 2.0

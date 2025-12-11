@@ -80,6 +80,33 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>4.0.0-M13</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.6.3</version>
+                    <configuration>
+                        <source>8</source>
+                        <doclint>none</doclint>
+                        <quiet>true</quiet>
+                        <doctitle>CoreFun ${project.version} API</doctitle>
+                        <windowtitle>CoreFun API</windowtitle>
+                        <bottom>
+                            <![CDATA[Copyright &#169; 2024 <a href="https://github.com/guinetik">Guinetik</a>. Licensed under Apache 2.0.]]>
+                        </bottom>
+                        <detectOfflineLinks>false</detectOfflineLinks>
+                        <skip>${maven.javadoc.skip}</skip>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.11.0</version>
                 </plugin>
@@ -121,4 +148,55 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <!-- Site reporting configuration -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <source>8</source>
+                    <doclint>none</doclint>
+                    <quiet>true</quiet>
+                    <detectOfflineLinks>false</detectOfflineLinks>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <id>default</id>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.5.0</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>summary</report>
+                            <report>dependency-info</report>
+                            <report>modules</report>
+                            <report>team</report>
+                            <report>scm</report>
+                            <report>issue-management</report>
+                            <report>licenses</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

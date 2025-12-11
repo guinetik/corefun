@@ -6,21 +6,46 @@ import java.util.concurrent.Callable;
  * A functional interface for operations that return a value and may throw checked exceptions.
  * <p>
  * {@code SafeCallable} extends the standard {@link Callable} interface with convenient
- * methods for exception handling and conversion to {@link Result} types.
+ * methods for exception handling and conversion to {@link Result} types. It provides
+ * multiple strategies for handling potential failures.
  * </p>
  *
- * <p>Example usage:</p>
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li><b>Exception wrapping</b> - Convert checked exceptions to unchecked with {@link #getOrThrow()}</li>
+ *   <li><b>Default values</b> - Provide fallbacks with {@link #getOrElse(Object)}</li>
+ *   <li><b>Result conversion</b> - Transform to functional Results with {@link #toResult()}</li>
+ *   <li><b>Callable compatibility</b> - Use anywhere a standard Callable is expected</li>
+ * </ul>
+ *
+ * <h2>Example Usage</h2>
  * <pre>{@code
  * SafeCallable<String> reader = () -> Files.readString(path);
  *
  * // Execute with automatic exception wrapping
- * String content = reader.getOrThrow();
+ * String content = reader.getOrThrow();  // throws SafeException on failure
  *
- * // Or convert to Result for functional handling
+ * // Or use a default value on failure
+ * String contentOrDefault = reader.getOrElse("default content");
+ *
+ * // Convert to Result for functional handling
  * Result<String, Exception> result = reader.toResult();
+ * result.fold(
+ *     ex -> handleError(ex),
+ *     content -> processContent(content)
+ * );
+ *
+ * // Create a callable that always returns a value
+ * SafeCallable<Config> defaultConfig = SafeCallable.of(Config.defaults());
  * }</pre>
  *
  * @param <T> the type of the result
+ * @author Guinetik &lt;guinetik@gmail.com&gt;
+ * @since 0.1.0
+ * @see SafeRunnable
+ * @see SafeException
+ * @see Result
+ * @see Try
  */
 @FunctionalInterface
 public interface SafeCallable<T> extends Callable<T> {

@@ -5,16 +5,49 @@ package com.guinetik.corefun;
  * <p>
  * {@code SafeException} provides a way to wrap checked exceptions as unchecked
  * exceptions, enabling cleaner functional code without excessive try-catch blocks.
+ * It is the standard exception type thrown by the CoreFun library when operations fail.
  * </p>
  *
- * <p>Example usage:</p>
+ * <h2>Design Philosophy</h2>
+ * <p>
+ * Java's checked exceptions force explicit handling at every call site, which
+ * conflicts with functional programming patterns like streams and lambdas.
+ * {@code SafeException} bridges this gap by allowing checked exceptions to propagate
+ * as unchecked exceptions while preserving the original cause for debugging.
+ * </p>
+ *
+ * <h2>When to Use</h2>
+ * <ul>
+ *   <li>Wrapping checked exceptions in lambda expressions</li>
+ *   <li>Converting library exceptions to application-level exceptions</li>
+ *   <li>Providing context messages while preserving the original cause</li>
+ * </ul>
+ *
+ * <h2>Example Usage</h2>
  * <pre>{@code
+ * // Manual wrapping with context
  * try {
  *     riskyOperation();
  * } catch (IOException e) {
- *     throw new SafeException("Failed to read file", e);
+ *     throw new SafeException("Failed to read file: " + path, e);
  * }
+ *
+ * // Using the static wrap method (preserves RuntimeExceptions)
+ * try {
+ *     operation();
+ * } catch (Exception e) {
+ *     throw SafeException.wrap(e);  // Returns original if already RuntimeException
+ * }
+ *
+ * // Adding context to any exception
+ * throw SafeException.wrap("Database query failed", e);
  * }</pre>
+ *
+ * @author Guinetik &lt;guinetik@gmail.com&gt;
+ * @since 0.1.0
+ * @see SafeRunnable
+ * @see SafeCallable
+ * @see SafeExecutor
  */
 public class SafeException extends RuntimeException {
 
