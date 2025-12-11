@@ -37,13 +37,13 @@ jobs:
         run: mvn clean install -DskipTests
 
       - name: Generate Maven Site
-        run: mvn site site:stage -DstagingDirectory=${{ github.workspace }}/staging
+        run: mvn site -DskipTests
 
       - name: Deploy to GitHub Pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./staging
+          publish_dir: ./target/site
           publish_branch: gh-pages
           force_orphan: true
           user_name: 'github-actions[bot]'
