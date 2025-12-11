@@ -12,17 +12,27 @@
 
     <custom>
         <fluidoSkin>
+            <!-- Modern dark theme - Vercel inspired -->
             <topBarEnabled>true</topBarEnabled>
             <sideBarEnabled>true</sideBarEnabled>
-            <navBarStyle>navbar-dark bg-primary</navBarStyle>
+            <navBarStyle>navbar-dark</navBarStyle>
             <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+            <!-- Disable GitHub ribbon for cleaner look -->
             <gitHub>
                 <projectId>guinetik/corefun</projectId>
                 <ribbonOrientation>right</ribbonOrientation>
                 <ribbonColor>darkblue</ribbonColor>
             </gitHub>
+            <skipGenerationDate>true</skipGenerationDate>
         </fluidoSkin>
     </custom>
+
+    <!-- Custom CSS override - path relative to module -->
+    <head>
+        <![CDATA[
+        <link rel="stylesheet" href="../css/corefun-theme.css" />
+        ]]>
+    </head>
 
     <bannerLeft>
         <name>CoreFun</name>
@@ -40,11 +50,11 @@
             <item name="Parent Project" href="../index.html"/>
         </menu>
 
-        <menu name="API Documentation">
+        <menu name="Documentation">
             <item name="Javadoc" href="apidocs/index.html"/>
         </menu>
 
-        <menu name="Reports">
+        <menu name="Generated Reports">
             <item name="JaCoCo Coverage" href="jacoco/index.html"/>
         </menu>
 
