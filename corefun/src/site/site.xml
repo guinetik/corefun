@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/DECORATION/1.8.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd"
-         name="CoreFun">
+         name="CoreFun Library">
 
     <skin>
         <groupId>org.apache.maven.skins</groupId>
@@ -12,7 +12,6 @@
 
     <custom>
         <fluidoSkin>
-            <!-- Modern dark sidebar theme -->
             <topBarEnabled>true</topBarEnabled>
             <sideBarEnabled>true</sideBarEnabled>
             <navBarStyle>navbar-dark bg-primary</navBarStyle>
@@ -27,17 +26,18 @@
 
     <bannerLeft>
         <name>CoreFun</name>
-        <href>https://github.com/guinetik/corefun</href>
+        <href>../index.html</href>
     </bannerLeft>
 
     <body>
         <breadcrumbs>
-            <item name="CoreFun" href="index.html"/>
+            <item name="CoreFun" href="../index.html"/>
+            <item name="Library" href="index.html"/>
         </breadcrumbs>
 
         <menu name="Overview">
-            <item name="Introduction" href="index.html"/>
-            <item name="Getting Started" href="getting-started.html"/>
+            <item name="About" href="index.html"/>
+            <item name="Parent Project" href="../index.html"/>
         </menu>
 
         <menu name="API Documentation">
@@ -45,7 +45,7 @@
         </menu>
 
         <menu name="Reports">
-            <item name="JaCoCo Coverage" href="corefun/jacoco/index.html"/>
+            <item name="JaCoCo Coverage" href="jacoco/index.html"/>
         </menu>
 
         <menu name="Project Information" ref="reports"/>
