@@ -18,8 +18,6 @@
             <navBarStyle>navbar-dark</navBarStyle>
             <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
             <skipGenerationDate>true</skipGenerationDate>
-            <!-- Custom CSS file - relative to module -->
-            <customCss>../css/corefun-theme.css</customCss>
         </fluidoSkin>
     </custom>
 
