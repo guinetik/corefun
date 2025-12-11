@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.guinetik</groupId>
+        <artifactId>corefun-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>corefun-examples</artifactId>
+    <packaging>jar</packaging>
+
+    <name>CoreFun Examples</name>
+    <description>Examples demonstrating CoreFun functional primitives usage</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.guinetik</groupId>
+            <artifactId>corefun</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <!-- Exec plugin for running examples -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.guinetik.corefun.examples.AllExamples</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
