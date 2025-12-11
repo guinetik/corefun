@@ -41,6 +41,13 @@
         <url>https://github.com/guinetik/corefun/issues</url>
     </issueManagement>
 
+    <distributionManagement>
+        <site>
+            <id>github-pages</id>
+            <url>https://guinetik.github.io/corefun/</url>
+        </site>
+    </distributionManagement>
+
     <modules>
         <module>corefun</module>
         <module>examples</module>
