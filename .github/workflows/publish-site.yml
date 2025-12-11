@@ -33,11 +33,11 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build project
-        run: mvn clean install -DskipTests
+      - name: Build and test project
+        run: mvn clean install
 
       - name: Generate Maven Site
-        run: mvn site -DskipTests
+        run: mvn site
 
       - name: Deploy to GitHub Pages branch
         uses: peaceiris/actions-gh-pages@v4
