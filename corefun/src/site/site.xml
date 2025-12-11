@@ -17,22 +17,11 @@
             <sideBarEnabled>true</sideBarEnabled>
             <navBarStyle>navbar-dark</navBarStyle>
             <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
-            <!-- Disable GitHub ribbon for cleaner look -->
-            <gitHub>
-                <projectId>guinetik/corefun</projectId>
-                <ribbonOrientation>right</ribbonOrientation>
-                <ribbonColor>darkblue</ribbonColor>
-            </gitHub>
             <skipGenerationDate>true</skipGenerationDate>
+            <!-- Custom CSS file - relative to module -->
+            <customCss>../css/corefun-theme.css</customCss>
         </fluidoSkin>
     </custom>
-
-    <!-- Custom CSS override - path relative to module -->
-    <head>
-        <![CDATA[
-        <link rel="stylesheet" href="../css/corefun-theme.css" />
-        ]]>
-    </head>
 
     <bannerLeft>
         <name>CoreFun</name>
