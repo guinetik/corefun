@@ -557,26 +557,183 @@ footer #poweredBy {
 }
 
 /* =============================================================================
-   RESPONSIVE: <=1200px (Tablet)
+   RESPONSIVE: <=992px (Collapsed Navigation)
    ============================================================================= */
 
-@media (max-width: 1200px) {
+@media (max-width: 992px) {
   :root {
     --page-gutter: 24px;
   }
 
-  /* Hamburger - always hidden since sidebar is disabled */
-  #topbar .btn-navbar {
+  /* Navbar container - logo left, title center, hamburger right */
+  #topbar .navbar-inner > .container {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    position: relative !important;
+    padding: 0 var(--page-gutter) !important;
+  }
+
+  /* Nav-collapse wrapper - push to left edge */
+  #topbar .nav-collapse {
+    position: absolute !important;
+    left: var(--page-gutter) !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Brand/Logo - visible on left */
+  #topbar .brand {
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #topbar .brand img {
+    width: 28px !important;
+    height: 24px !important;
+    display: block !important;
+  }
+
+  /* Hide the brand text on mobile - title shows in center instead */
+  #topbar .brand span,
+  #topbar .brand > *:not(img) {
     display: none !important;
   }
 
-  /* Brand - slightly smaller on tablets */
-  #topbar .brand img {
-    width: 24px !important;
-    height: 20px !important;
+  /* Centered title - using ::after on container */
+  #topbar .navbar-inner > .container::after {
+    content: "CoreFun" !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    font-size: var(--font-size-base) !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    pointer-events: none !important;
+    white-space: nowrap !important;
   }
 
-  /* Hide Twitter on smaller screens */
+  /* ========== HAMBURGER BUTTON ========== */
+  #topbar .btn-navbar {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: var(--radius) !important;
+    cursor: pointer !important;
+    transition: all var(--transition) !important;
+    flex-shrink: 0 !important;
+  }
+
+  #topbar .btn-navbar:hover {
+    background: var(--bg-overlay) !important;
+    border-color: var(--border-default) !important;
+  }
+
+  #topbar .btn-navbar .icon-bar {
+    display: block !important;
+    width: 20px !important;
+    height: 2px !important;
+    background: var(--text-primary) !important;
+    margin: 3px 0 !important;
+    border-radius: 2px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  /* ========== COLLAPSED NAV MENU ========== */
+  /* Hide nav by default */
+  #topbar ul.nav,
+  #topbar .nav-collapse ul.nav {
+    display: none !important;
+  }
+
+  /* Show nav when JS adds .open class (from custom.js) */
+  #topbar ul.nav.open {
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+    top: var(--navbar-height) !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: var(--bg-base) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    padding: var(--sp-2) 0 !important;
+    z-index: 999 !important;
+    max-height: calc(100vh - var(--navbar-height)) !important;
+    overflow-y: auto !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Nav items - full width, stacked */
+  #topbar ul.nav.open > li {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+  }
+
+  #topbar ul.nav.open > li > a {
+    display: block !important;
+    height: auto !important;
+    padding: var(--sp-4) var(--page-gutter) !important;
+    font-size: var(--font-size-base) !important;
+    color: var(--text-secondary) !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+  }
+
+  #topbar ul.nav.open > li:last-child > a {
+    border-bottom: none !important;
+  }
+
+  #topbar ul.nav.open > li > a:hover {
+    background: var(--bg-overlay) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* Dropdown menus - expand inline when nav is open */
+  #topbar ul.nav.open .dropdown.open .dropdown-menu {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    background: var(--bg-raised) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  #topbar ul.nav.open .dropdown-menu::before {
+    display: none !important;
+  }
+
+  #topbar ul.nav.open .dropdown-menu > li > a {
+    padding: var(--sp-3) var(--page-gutter) !important;
+    padding-left: calc(var(--page-gutter) + var(--sp-5)) !important;
+    color: var(--text-muted) !important;
+    font-size: var(--font-size-sm) !important;
+    border-radius: 0 !important;
+  }
+
+  #topbar ul.nav.open .dropdown-menu > li > a:hover {
+    background: var(--bg-overlay) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* Hide Twitter widget on smaller screens */
   #topbar .nav.pull-right {
     display: none !important;
   }
@@ -595,6 +752,15 @@ footer #poweredBy {
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
   h3 { font-size: 1.1rem; }
+
+  /* Navbar adjustments for phone - comfortable edge padding */
+  #topbar .navbar-inner > .container {
+    padding: 0 20px !important;
+  }
+
+  #topbar .nav-collapse {
+    left: 20px !important;
+  }
 
   #topbar .brand {
     font-size: var(--font-size-base) !important;

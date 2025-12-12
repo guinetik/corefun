@@ -37,7 +37,7 @@
       var dropdownToggles = nav.querySelectorAll('.dropdown-toggle');
       dropdownToggles.forEach(function(toggle) {
         toggle.addEventListener('click', function(e) {
-          if (window.innerWidth <= 1200) {
+          if (window.innerWidth <= 992) {
             e.preventDefault();
             e.stopPropagation();
             var parent = this.parentElement;
@@ -54,6 +54,16 @@
             }
           }
         });
+      });
+
+      // Close nav when window resizes to desktop
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 992) {
+          nav.classList.remove('open');
+          nav.querySelectorAll('.dropdown').forEach(function(dd) {
+            dd.classList.remove('open');
+          });
+        }
       });
     }
   });
