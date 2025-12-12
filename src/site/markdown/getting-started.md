@@ -137,4 +137,4 @@ String message = switch (result) {
 ## Next Steps
 
 - Browse the [API Documentation](apidocs/index.html)
-- Check out the [examples module](https://github.com/guinetik/corefun/tree/main/examples) on GitHub
+- Check out the [examples module](https://github.com/guinetik/corefun/tree/masters/examples) on GitHub

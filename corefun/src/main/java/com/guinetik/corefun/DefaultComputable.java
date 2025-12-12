@@ -19,10 +19,10 @@ package com.guinetik.corefun;
  * Typically, you should use {@link Computable#of(Object)} rather than constructing
  * this class directly:
  * </p>
- * <pre>{@code
- * Computable<String> comp = Computable.of("value");  // Preferred
- * Computable<String> comp2 = new DefaultComputable<>("value");  // Also valid
- * }</pre>
+ * <pre class="language-java"><code>
+ * Computable&lt;String&gt; comp = Computable.of("value");  // Preferred
+ * Computable&lt;String&gt; comp2 = new DefaultComputable&lt;&gt;("value");  // Also valid
+ * </code></pre>
  *
  * @param <T> the type of the value
  * @author Guinetik &lt;guinetik@gmail.com&gt;

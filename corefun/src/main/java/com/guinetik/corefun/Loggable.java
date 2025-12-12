@@ -25,11 +25,11 @@ import java.util.function.Consumer;
  * </ul>
  *
  * <h2>Example with SLF4J</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * public class MyService implements Loggable {
  *     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(MyService.class);
  *
- *     @Override
+ *     &#64;Override
  *     public Logger logger() {
  *         return Logger.of(LOG::info, LOG::warn, LOG::error);
  *     }
@@ -40,40 +40,40 @@ import java.util.function.Consumer;
  *         logger().info("Work completed");
  *     }
  * }
- * }</pre>
+ * </code></pre>
  *
  * <h2>Example with java.util.logging</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * public class JulService implements Loggable {
  *     private static final java.util.logging.Logger LOG =
  *         java.util.logging.Logger.getLogger(JulService.class.getName());
  *
- *     @Override
+ *     &#64;Override
  *     public Logger logger() {
  *         return Logger.of(
- *             msg -> LOG.info(msg),
- *             msg -> LOG.warning(msg),
- *             msg -> LOG.severe(msg)
+ *             msg -&gt; LOG.info(msg),
+ *             msg -&gt; LOG.warning(msg),
+ *             msg -&gt; LOG.severe(msg)
  *         );
  *     }
  * }
- * }</pre>
+ * </code></pre>
  *
  * <h2>Example with Simple println</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * public class SimpleService implements Loggable {
- *     @Override
+ *     &#64;Override
  *     public Logger logger() {
  *         return Logger.println();
  *     }
  * }
- * }</pre>
+ * </code></pre>
  *
  * <h2>Tagged Logging</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * Logger tagged = Logger.tagged("MyComponent", Logger.println());
  * tagged.info("Starting");  // prints: [MyComponent] Starting
- * }</pre>
+ * </code></pre>
  *
  * @author Guinetik &lt;guinetik@gmail.com&gt;
  * @since 0.1.0

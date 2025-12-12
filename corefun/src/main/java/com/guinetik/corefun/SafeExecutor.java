@@ -28,48 +28,48 @@ import java.util.function.Consumer;
  * </p>
  *
  * <h2>Example with SLF4J</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * public class DataProcessor implements SafeExecutor {
  *     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(DataProcessor.class);
  *
- *     @Override
+ *     &#64;Override
  *     public Loggable.Logger logger() {
  *         return Loggable.Logger.of(LOG::info, LOG::warn, LOG::error);
  *     }
  *
  *     public Data process() {
- *         return safely("Process data", () -> {
+ *         return safely("Process data", () -&gt; {
  *             // processing logic - automatically logged
  *             return processedData;
  *         });
  *     }
  * }
- * }</pre>
+ * </code></pre>
  *
  * <h2>Example with Simple println</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * public class SimpleProcessor implements SafeExecutor {
- *     @Override
+ *     &#64;Override
  *     public Loggable.Logger logger() {
  *         return Loggable.Logger.println();
  *     }
  *
  *     public void doWork() {
- *         safely("Do work", () -> performWork());
+ *         safely("Do work", () -&gt; performWork());
  *         // Logs: [INFO] Executing: Do work
  *         // Logs: [INFO] Completed: Do work in 123ms
  *     }
  * }
- * }</pre>
+ * </code></pre>
  *
  * <h2>Result-Based Error Handling</h2>
- * <pre>{@code
- * Result<Data, String> result = safelyResult("Load data", () -> loadData());
+ * <pre class="language-java"><code>
+ * Result&lt;Data, String&gt; result = safelyResult("Load data", () -&gt; loadData());
  * result.fold(
- *     error -> showError(error),
- *     data -> displayData(data)
+ *     error -&gt; showError(error),
+ *     data -&gt; displayData(data)
  * );
- * }</pre>
+ * </code></pre>
  *
  * @author Guinetik &lt;guinetik@gmail.com&gt;
  * @since 0.1.0

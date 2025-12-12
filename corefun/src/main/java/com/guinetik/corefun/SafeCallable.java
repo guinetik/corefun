@@ -19,8 +19,8 @@ import java.util.concurrent.Callable;
  * </ul>
  *
  * <h2>Example Usage</h2>
- * <pre>{@code
- * SafeCallable<String> reader = () -> Files.readString(path);
+ * <pre class="language-java"><code>
+ * SafeCallable&lt;String&gt; reader = () -&gt; Files.readString(path);
  *
  * // Execute with automatic exception wrapping
  * String content = reader.getOrThrow();  // throws SafeException on failure
@@ -29,15 +29,15 @@ import java.util.concurrent.Callable;
  * String contentOrDefault = reader.getOrElse("default content");
  *
  * // Convert to Result for functional handling
- * Result<String, Exception> result = reader.toResult();
+ * Result&lt;String, Exception&gt; result = reader.toResult();
  * result.fold(
- *     ex -> handleError(ex),
- *     content -> processContent(content)
+ *     ex -&gt; handleError(ex),
+ *     content -&gt; processContent(content)
  * );
  *
  * // Create a callable that always returns a value
- * SafeCallable<Config> defaultConfig = SafeCallable.of(Config.defaults());
- * }</pre>
+ * SafeCallable&lt;Config&gt; defaultConfig = SafeCallable.of(Config.defaults());
+ * </code></pre>
  *
  * @param <T> the type of the result
  * @author Guinetik &lt;guinetik@gmail.com&gt;

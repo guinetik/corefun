@@ -19,32 +19,32 @@ import java.util.concurrent.Callable;
  * </ul>
  *
  * <h2>Example Usage</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * public class MyService implements Timing {
- *     @Override
+ *     &#64;Override
  *     public void onTimed(String description, long milliseconds) {
  *         logger.info("{} took {}ms", description, milliseconds);
  *     }
  *
  *     public User loadUser(long id) {
- *         return timed("Load user " + id, () -> userRepository.findById(id));
+ *         return timed("Load user " + id, () -&gt; userRepository.findById(id));
  *     }
  *
  *     public void sendNotification() {
- *         timedVoid("Send notification", () -> notificationService.send());
+ *         timedVoid("Send notification", () -&gt; notificationService.send());
  *     }
  * }
- * }</pre>
+ * </code></pre>
  *
  * <h2>Metrics Collection</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * // Report to metrics system
- * Timing metricsTimer = (desc, ms) ->
+ * Timing metricsTimer = (desc, ms) -&gt;
  *     metrics.recordTiming("operation." + desc, ms, TimeUnit.MILLISECONDS);
  *
  * // Use the timer
- * metricsTimer.timed("database.query", () -> db.execute(query));
- * }</pre>
+ * metricsTimer.timed("database.query", () -&gt; db.execute(query));
+ * </code></pre>
  *
  * @author Guinetik &lt;guinetik@gmail.com&gt;
  * @since 0.1.0

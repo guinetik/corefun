@@ -17,9 +17,9 @@ package com.guinetik.corefun;
  * </p>
  *
  * <h2>Example Usage</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * // Define an operation that throws checked exceptions
- * SafeRunnable task = () -> {
+ * SafeRunnable task = () -&gt; {
  *     Files.delete(path);  // throws IOException
  * };
  *
@@ -30,8 +30,8 @@ package com.guinetik.corefun;
  * task.execute();  // throws SafeException on failure
  *
  * // Create from existing Runnable
- * SafeRunnable fromRunnable = SafeRunnable.from(() -> doSomething());
- * }</pre>
+ * SafeRunnable fromRunnable = SafeRunnable.from(() -&gt; doSomething());
+ * </code></pre>
  *
  * @author Guinetik &lt;guinetik@gmail.com&gt;
  * @since 0.1.0

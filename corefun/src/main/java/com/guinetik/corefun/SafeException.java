@@ -24,7 +24,7 @@ package com.guinetik.corefun;
  * </ul>
  *
  * <h2>Example Usage</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * // Manual wrapping with context
  * try {
  *     riskyOperation();
@@ -41,7 +41,7 @@ package com.guinetik.corefun;
  *
  * // Adding context to any exception
  * throw SafeException.wrap("Database query failed", e);
- * }</pre>
+ * </code></pre>
  *
  * @author Guinetik &lt;guinetik@gmail.com&gt;
  * @since 0.1.0

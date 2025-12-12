@@ -25,28 +25,28 @@ import java.util.function.Supplier;
  * </ul>
  *
  * <h2>Example Usage</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * // Simple transformation
- * Computable<String> name = Computable.of("hello");
- * Computable<Integer> length = name.map(String::length);
+ * Computable&lt;String&gt; name = Computable.of("hello");
+ * Computable&lt;Integer&gt; length = name.map(String::length);
  * System.out.println(length.getValue()); // prints 5
  *
  * // Chained transformations
  * String result = Computable.of(100)
- *     .map(n -> n * 2)
- *     .filter(n -> n > 0, () -> 0)
- *     .map(n -> "Result: " + n)
+ *     .map(n -&gt; n * 2)
+ *     .filter(n -&gt; n &gt; 0, () -&gt; 0)
+ *     .map(n -&gt; "Result: " + n)
  *     .getValue();
  *
  * // Combining values
- * Computable<Integer> a = Computable.of(10);
- * Computable<Integer> b = Computable.of(5);
+ * Computable&lt;Integer&gt; a = Computable.of(10);
+ * Computable&lt;Integer&gt; b = Computable.of(5);
  * int sum = a.combine(b, Integer::sum).getValue(); // 15
  *
  * // Validation
  * boolean valid = Computable.of(email)
- *     .isValid(e -> e.contains("@"));
- * }</pre>
+ *     .isValid(e -&gt; e.contains("@"));
+ * </code></pre>
  *
  * @param <T> the type of the value being managed
  * @author Guinetik &lt;guinetik@gmail.com&gt;
@@ -77,10 +77,10 @@ public interface Computable<T> {
      * Transforms the value using the provided function.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Computable<String> original = Computable.of("hello");
-     * Computable<Integer> length = original.map(String::length);
-     * }</pre>
+     * <pre class="language-java"><code>
+     * Computable&lt;String&gt; original = Computable.of("hello");
+     * Computable&lt;Integer&gt; length = original.map(String::length);
+     * </code></pre>
      *
      * @param <R> the type of the result
      * @param transformer a function to transform the value
@@ -94,10 +94,10 @@ public interface Computable<T> {
      * Applies a transformation that returns a Computable and flattens the result.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Computable<Integer> age = Computable.of(30);
-     * Computable<String> status = age.flatMap(a -> Computable.of(a >= 18 ? "Adult" : "Minor"));
-     * }</pre>
+     * <pre class="language-java"><code>
+     * Computable&lt;Integer&gt; age = Computable.of(30);
+     * Computable&lt;String&gt; status = age.flatMap(a -&gt; Computable.of(a &gt;= 18 ? "Adult" : "Minor"));
+     * </code></pre>
      *
      * @param <R> the type of the result
      * @param transformer a function that returns a Computable
@@ -111,10 +111,10 @@ public interface Computable<T> {
      * Validates the value using the specified predicate.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Computable<Integer> age = Computable.of(25);
-     * boolean isAdult = age.isValid(a -> a >= 18);
-     * }</pre>
+     * <pre class="language-java"><code>
+     * Computable&lt;Integer&gt; age = Computable.of(25);
+     * boolean isAdult = age.isValid(a -&gt; a &gt;= 18);
+     * </code></pre>
      *
      * @param validator a predicate to test the value
      * @return true if the value passes validation
@@ -127,10 +127,10 @@ public interface Computable<T> {
      * Filters the value, returning a default if the predicate fails.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Computable<Integer> age = Computable.of(15);
-     * Computable<Integer> adultAge = age.filter(a -> a >= 18, () -> 18);
-     * }</pre>
+     * <pre class="language-java"><code>
+     * Computable&lt;Integer&gt; age = Computable.of(15);
+     * Computable&lt;Integer&gt; adultAge = age.filter(a -&gt; a &gt;= 18, () -&gt; 18);
+     * </code></pre>
      *
      * @param predicate the condition to test
      * @param defaultValue supplier for the default value if test fails
@@ -144,10 +144,10 @@ public interface Computable<T> {
      * Reduces the value by combining it with an initial value.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Computable<String> name = Computable.of("John");
-     * String greeting = name.reduce("Hello, ", (acc, n) -> acc + n);
-     * }</pre>
+     * <pre class="language-java"><code>
+     * Computable&lt;String&gt; name = Computable.of("John");
+     * String greeting = name.reduce("Hello, ", (acc, n) -&gt; acc + n);
+     * </code></pre>
      *
      * @param <R> the type of the result
      * @param initialValue the initial value for reduction
@@ -162,11 +162,11 @@ public interface Computable<T> {
      * Combines this value with another Computable's value.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Computable<Integer> a = Computable.of(10);
-     * Computable<Integer> b = Computable.of(5);
-     * Computable<Integer> sum = a.combine(b, Integer::sum);
-     * }</pre>
+     * <pre class="language-java"><code>
+     * Computable&lt;Integer&gt; a = Computable.of(10);
+     * Computable&lt;Integer&gt; b = Computable.of(5);
+     * Computable&lt;Integer&gt; sum = a.combine(b, Integer::sum);
+     * </code></pre>
      *
      * @param <U> the type of the other value
      * @param <R> the type of the result
@@ -182,10 +182,10 @@ public interface Computable<T> {
      * Performs an action on the value without altering it.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Computable<String> name = Computable.of("Alice");
+     * <pre class="language-java"><code>
+     * Computable&lt;String&gt; name = Computable.of("Alice");
      * name.peek(System.out::println).map(String::toUpperCase);
-     * }</pre>
+     * </code></pre>
      *
      * @param action a consumer to perform on the value
      * @return this Computable for chaining
@@ -199,10 +199,10 @@ public interface Computable<T> {
      * Returns the value if non-null, otherwise returns the default.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Computable<String> nullable = Computable.of(null);
+     * <pre class="language-java"><code>
+     * Computable&lt;String&gt; nullable = Computable.of(null);
      * String name = nullable.orElse("Unknown");
-     * }</pre>
+     * </code></pre>
      *
      * @param other the default value
      * @return the value or the default

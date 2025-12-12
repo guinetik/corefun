@@ -21,26 +21,26 @@ import java.util.function.Supplier;
  * </ul>
  *
  * <h2>Example Usage</h2>
- * <pre>{@code
+ * <pre class="language-java"><code>
  * // Execute and get Result with string error
- * Result<String, String> content = Try.of(() -> Files.readString(path));
+ * Result&lt;String, String&gt; content = Try.of(() -&gt; Files.readString(path));
  *
  * // Chain operations - errors propagate automatically
- * Result<Integer, String> lineCount = Try.of(() -> Files.readString(path))
- *     .map(s -> s.split("\n").length);
+ * Result&lt;Integer, String&gt; lineCount = Try.of(() -&gt; Files.readString(path))
+ *     .map(s -&gt; s.split("\n").length);
  *
  * // Keep full exception for detailed error handling
- * Result<User, Exception> user = Try.ofException(() -> userService.find(id));
+ * Result&lt;User, Exception&gt; user = Try.ofException(() -&gt; userService.find(id));
  *
  * // Custom error mapping
- * Result<Config, AppError> config = Try.of(
- *     () -> loadConfig(path),
- *     e -> new AppError("CONFIG_LOAD_FAILED", e)
+ * Result&lt;Config, AppError&gt; config = Try.of(
+ *     () -&gt; loadConfig(path),
+ *     e -&gt; new AppError("CONFIG_LOAD_FAILED", e)
  * );
  *
  * // Safe execution with default
- * int port = Try.getOrDefault(() -> Integer.parseInt(env), 8080);
- * }</pre>
+ * int port = Try.getOrDefault(() -&gt; Integer.parseInt(env), 8080);
+ * </code></pre>
  *
  * @author Guinetik &lt;guinetik@gmail.com&gt;
  * @since 0.1.0

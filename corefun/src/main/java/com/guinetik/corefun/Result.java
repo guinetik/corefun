@@ -23,28 +23,28 @@ import java.util.function.Supplier;
  * </ul>
  *
  * <h2>Example Usage</h2>
- * <pre>{@code
- * Result<User, String> result = findUser(id);
+ * <pre class="language-java"><code>
+ * Result&lt;User, String&gt; result = findUser(id);
  *
  * // Pattern matching with fold
  * String message = result.fold(
- *     error -> "Error: " + error,
- *     user -> "Found: " + user.getName()
+ *     error -&gt; "Error: " + error,
+ *     user -&gt; "Found: " + user.getName()
  * );
  *
  * // Chaining operations
- * Result<String, String> greeting = result
- *     .map(user -> user.getName())
- *     .map(name -> "Hello, " + name);
+ * Result&lt;String, String&gt; greeting = result
+ *     .map(user -&gt; user.getName())
+ *     .map(name -&gt; "Hello, " + name);
  *
  * // Validation
- * Result<Integer, String> validAge = Result.success(age)
- *     .validate(a -> a >= 0 && a <= 150, a -> "Invalid age: " + a);
+ * Result&lt;Integer, String&gt; validAge = Result.success(age)
+ *     .validate(a -&gt; a &gt;= 0 &amp;&amp; a &lt;= 150, a -&gt; "Invalid age: " + a);
  *
  * // Recovery from errors
- * Result<User, String> userOrGuest = findUser(id)
- *     .recover(error -> Result.success(guestUser));
- * }</pre>
+ * Result&lt;User, String&gt; userOrGuest = findUser(id)
+ *     .recover(error -&gt; Result.success(guestUser));
+ * </code></pre>
  *
  * @param <S> the type of the success value
  * @param <F> the type of the failure value
@@ -117,12 +117,12 @@ public abstract class Result<S, F> {
      * This is the primary way to extract values from a Result.
      *
      * <p>Example:</p>
-     * <pre>{@code
+     * <pre class="language-java"><code>
      * String message = result.fold(
-     *     error -> "Failed: " + error,
-     *     value -> "Success: " + value
+     *     error -&gt; "Failed: " + error,
+     *     value -&gt; "Success: " + value
      * );
-     * }</pre>
+     * </code></pre>
      *
      * @param <R> the return type
      * @param onFailure function to apply if failure
@@ -147,10 +147,10 @@ public abstract class Result<S, F> {
      * Useful for chaining operations that might fail.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Result<User, String> user = findUser(id);
-     * Result<Account, String> account = user.flatMap(u -> findAccount(u.getAccountId()));
-     * }</pre>
+     * <pre class="language-java"><code>
+     * Result&lt;User, String&gt; user = findUser(id);
+     * Result&lt;Account, String&gt; account = user.flatMap(u -&gt; findAccount(u.getAccountId()));
+     * </code></pre>
      *
      * @param <T> the new success type
      * @param mapper function that returns a Result
@@ -187,10 +187,10 @@ public abstract class Result<S, F> {
      * Recovers from a failure by applying a function that returns a new Result.
      *
      * <p>Example:</p>
-     * <pre>{@code
-     * Result<User, String> user = findUser(id)
-     *     .recover(error -> findGuestUser());
-     * }</pre>
+     * <pre class="language-java"><code>
+     * Result&lt;User, String&gt; user = findUser(id)
+     *     .recover(error -&gt; findGuestUser());
+     * </code></pre>
      *
      * @param handler function to handle the failure
      * @return this if success, or the result of the handler
