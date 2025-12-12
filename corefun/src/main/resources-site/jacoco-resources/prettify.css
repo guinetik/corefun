@@ -1,0 +1,14 @@
+/* Pretty printing styles - Terminal Dark Theme */
+/* Used with prettify.js for source code highlighting */
+
+.str { color: #00ffcc; }           /* Strings - cyan */
+.kwd { color: #00ff44; font-weight: 600; }  /* Keywords - bright green */
+.com { color: #3d5a3d; font-style: italic; }  /* Comments - dim green */
+.typ { color: #88ff00; }           /* Types - lime */
+.lit { color: #ffcc00; }           /* Literals - gold */
+.pun { color: #00cc00; }           /* Punctuation - green */
+.pln { color: #a0a0a0; }           /* Plain text - gray */
+.tag { color: #00ff66; }           /* Tags - green */
+.atn { color: #88ff44; }           /* Attribute names - lime */
+.atv { color: #00ffcc; }           /* Attribute values - cyan */
+.dec { color: #ffaa00; }           /* Declarations - orange */

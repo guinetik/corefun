@@ -302,7 +302,8 @@ header#topbar {
   position: absolute !important;
   top: 100% !important;
   left: 0 !important;
-  margin-top: var(--sp-2) !important;
+  margin-top: 0 !important;
+  padding-top: var(--sp-2) !important;
   min-width: 200px !important;
   background: var(--bg-raised) !important;
   border: 1px solid var(--border-default) !important;
@@ -310,6 +311,16 @@ header#topbar {
   padding: var(--sp-2) !important;
   box-shadow: var(--shadow-dropdown) !important;
   z-index: 1001 !important;
+}
+
+/* Invisible bridge to prevent hover gap */
+#topbar .dropdown-menu::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -10px !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 10px !important;
 }
 
 #topbar .dropdown-menu > li > a {
@@ -331,7 +342,17 @@ header#topbar {
   top: 0 !important;
   left: 100% !important;
   margin-top: 0 !important;
-  margin-left: var(--sp-1) !important;
+  margin-left: 0 !important;
+}
+
+/* Invisible bridge for submenus (horizontal gap) */
+#topbar .dropdown-submenu > .dropdown-menu::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -10px !important;
+  width: 10px !important;
+  height: 100% !important;
 }
 
 /* Twitter button container - hide on mobile, show on desktop */
@@ -536,7 +557,7 @@ footer #poweredBy {
 }
 
 /* =============================================================================
-   RESPONSIVE: <=1200px (Tablet - Hamburger Menu)
+   RESPONSIVE: <=1200px (Tablet)
    ============================================================================= */
 
 @media (max-width: 1200px) {
@@ -544,148 +565,18 @@ footer #poweredBy {
     --page-gutter: 24px;
   }
 
-  /* Navbar inner - flex layout */
-  #topbar .navbar-inner {
-    padding: 0 !important;
-  }
-
-  #topbar .navbar-inner > .container {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    height: var(--navbar-height) !important;
-    position: relative !important;
-    padding: 0 var(--page-gutter) !important;
-  }
-
-  /* Hamburger - visible on right */
+  /* Hamburger - always hidden since sidebar is disabled */
   #topbar .btn-navbar {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 40px !important;
-    height: 40px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    background: transparent !important;
-    border: 1px solid var(--border-default) !important;
-    border-radius: var(--radius) !important;
-    cursor: pointer !important;
-    flex-shrink: 0 !important;
-    order: 3 !important;
+    display: none !important;
   }
 
-  #topbar .btn-navbar:hover {
-    background: var(--bg-overlay) !important;
-  }
-
-  #topbar .btn-navbar .icon-bar {
-    display: block !important;
-    width: 18px !important;
-    height: 2px !important;
-    background: var(--text-primary) !important;
-    margin: 2px 0 !important;
-    border-radius: 1px !important;
-  }
-
-  /* Nav collapse wrapper - align brand to left */
-  #topbar .nav-collapse {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    flex: 1 !important;
-    order: 1 !important;
-  }
-
-  /* Brand - left aligned with logo and text */
-  #topbar .brand {
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--sp-2) !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    color: var(--text-primary) !important;
-  }
-
+  /* Brand - slightly smaller on tablets */
   #topbar .brand img {
     width: 24px !important;
     height: 20px !important;
   }
 
-  /* Show "CoreFun" text after logo on mobile */
-  #topbar .brand::after {
-    content: "CoreFun" !important;
-    display: inline !important;
-    font-size: var(--font-size-base) !important;
-    font-weight: 600 !important;
-    color: var(--text-primary) !important;
-  }
-
-  /* Hamburger stays on right */
-  #topbar .btn-navbar {
-    order: 2 !important;
-    margin-left: auto !important;
-  }
-
-  /* Main nav - hidden by default, shown as dropdown */
-  #topbar ul.nav:not(.pull-right) {
-    display: none !important;
-    position: fixed !important;
-    top: var(--navbar-height) !important;
-    left: 0 !important;
-    right: 0 !important;
-    flex-direction: column !important;
-    background: var(--bg-base) !important;
-    border-bottom: 1px solid var(--border-subtle) !important;
-    padding: var(--sp-3) 0 !important;
-    z-index: 999 !important;
-    max-height: calc(100vh - var(--navbar-height)) !important;
-    overflow-y: auto !important;
-  }
-
-  /* Show nav when open */
-  #topbar ul.nav.open:not(.pull-right) {
-    display: flex !important;
-  }
-
-  #topbar ul.nav:not(.pull-right) > li {
-    width: 100% !important;
-    height: auto !important;
-    border-bottom: 1px solid var(--border-subtle) !important;
-  }
-
-  #topbar ul.nav:not(.pull-right) > li:last-child {
-    border-bottom: none !important;
-  }
-
-  #topbar ul.nav:not(.pull-right) > li > a {
-    height: auto !important;
-    padding: var(--sp-4) var(--page-gutter) !important;
-    font-size: var(--font-size-base) !important;
-    border-radius: 0 !important;
-  }
-
-  /* Mobile dropdowns - inline */
-  #topbar .dropdown-menu {
-    position: static !important;
-    width: 100% !important;
-    margin: 0 !important;
-    background: var(--bg-raised) !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-  }
-
-  #topbar .dropdown-menu > li > a {
-    padding: var(--sp-3) var(--page-gutter) !important;
-    padding-left: calc(var(--page-gutter) + var(--sp-4)) !important;
-    border-radius: 0 !important;
-  }
-
-  /* Hide Twitter on mobile */
+  /* Hide Twitter on smaller screens */
   #topbar .nav.pull-right {
     display: none !important;
   }

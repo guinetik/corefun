@@ -67,10 +67,7 @@
 
         <menu name="Documentation">
             <item name="Javadoc" href="apidocs/index.html"/>
-        </menu>
-
-        <menu name="Generated Reports">
-            <item name="JaCoCo Coverage" href="corefun/jacoco/index.html"/>
+            <item name="JaCoCo Coverage" href="corefun/coverage/index.html"/>
         </menu>
 
         <menu name="Project Information" ref="reports"/>
