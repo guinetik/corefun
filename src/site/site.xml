@@ -16,7 +16,7 @@
             <topBarIcon>
                 <name>CoreFun</name>
                 <alt>CoreFun</alt>
-                <src>/images/logo.svg</src>
+                <src>https://guinetik.github.io/corefun/images/logo.svg</src>
                 <href>/index.html</href>
             </topBarIcon>
             <navBarStyle>navbar-dark</navBarStyle>
@@ -37,7 +37,7 @@
 
     <bannerLeft>
         <name>CoreFun</name>
-        <src>/images/logo.svg</src>
+        <src>https://guinetik.github.io/corefun/images/logo.svg</src>
         <width>32</width>
         <height>28</height>
         <href>index.html</href>

@@ -115,7 +115,7 @@
                             <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
                             <div class="corefun-header">
                                 <a href="/" class="corefun-brand">
-                                    <img src="/images/logo.svg" alt="CoreFun" width="24" height="24" />
+                                    <img src="https://guinetik.github.io/corefun/images/logo.svg" alt="CoreFun" width="24" height="24" />
                                     <span>CoreFun</span>
                                 </a>
                                 <a href="/" class="corefun-back">&#8592; Back to Docs</a>
@@ -210,7 +210,7 @@
                         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
                         <div class="corefun-header">
                             <a href="/" class="corefun-brand">
-                                <img src="/images/logo.svg" alt="CoreFun" width="24" height="24" />
+                                <img src="https://guinetik.github.io/corefun/images/logo.svg" alt="CoreFun" width="24" height="24" />
                                 <span>CoreFun</span>
                             </a>
                             <a href="/" class="corefun-back">&#8592; Back to Docs</a>
