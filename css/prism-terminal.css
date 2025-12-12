@@ -1,0 +1,228 @@
+/*
+ * Prism.js Terminal Theme
+ * Green-on-black inspired by classic terminals and Matrix aesthetic
+ * For CoreFun documentation
+ */
+
+/* Override base Prism theme completely */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #00ff00 !important;
+  background: none;
+  font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", monospace;
+  font-size: 13px;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.6;
+  tab-size: 4;
+  hyphens: none;
+  text-shadow: none !important;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1.25em;
+  margin: 1.5em 0;
+  overflow: auto;
+  border-radius: 6px;
+  background: #0a0a0a !important;
+  border: 1px solid #1a1a1a;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Inline code - subtle green tint */
+:not(pre) > code[class*="language-"] {
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  background: #0d1a0d;
+  border: 1px solid #1a2a1a;
+  color: #4ade80;
+  text-shadow: none;
+}
+
+/* Token colors - terminal palette */
+
+/* Comments - dim green */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #3d5a3d !important;
+  font-style: italic;
+  background: none !important;
+}
+
+/* Punctuation */
+.token.punctuation {
+  color: #00cc00 !important;
+  background: none !important;
+}
+
+/* Namespace */
+.token.namespace {
+  opacity: 0.8;
+}
+
+/* Strings - bright cyan/teal */
+.token.string,
+.token.attr-value {
+  color: #00ffcc !important;
+  background: none !important;
+}
+
+/* Properties, tags, symbols */
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #ffcc00 !important;
+  background: none !important;
+}
+
+/* Selectors, chars, inserted */
+.token.selector,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #00ff88 !important;
+  background: none !important;
+}
+
+/* Operators, entities, URLs */
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #00ffaa !important;
+  background: none !important;
+}
+
+/* At-rules, attributes, functions */
+.token.atrule,
+.token.attr-name,
+.token.function,
+.token.class-name {
+  color: #88ff00 !important;
+  background: none !important;
+}
+
+/* Keywords - bright green */
+.token.keyword {
+  color: #00ff44 !important;
+  font-weight: 600;
+  background: none !important;
+}
+
+/* Regex, important */
+.token.regex,
+.token.important,
+.token.variable {
+  color: #ff8800 !important;
+  background: none !important;
+}
+
+/* Important, bold */
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+/* Italic */
+.token.italic {
+  font-style: italic;
+}
+
+/* Entity */
+.token.entity {
+  cursor: help;
+}
+
+/* Java-specific enhancements */
+.language-java .token.keyword {
+  color: #00ff44 !important;
+  background: none !important;
+}
+
+.language-java .token.class-name {
+  color: #88ff00 !important;
+  background: none !important;
+}
+
+.language-java .token.function {
+  color: #44ff88 !important;
+  background: none !important;
+}
+
+.language-java .token.annotation {
+  color: #ffaa00 !important;
+  background: none !important;
+}
+
+/* XML-specific */
+.language-xml .token.tag {
+  color: #00ff66 !important;
+  background: none !important;
+}
+
+.language-xml .token.attr-name {
+  color: #88ff44 !important;
+  background: none !important;
+}
+
+.language-xml .token.attr-value {
+  color: #00ffcc !important;
+  background: none !important;
+}
+
+/* Line numbers if enabled */
+.line-numbers .line-numbers-rows {
+  border-right: 1px solid #1a3a1a;
+}
+
+.line-numbers-rows > span:before {
+  color: #2a4a2a;
+}
+
+/* Selection */
+pre[class*="language-"]::-moz-selection,
+pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection,
+code[class*="language-"] ::-moz-selection {
+  background: #0a3a0a;
+  text-shadow: none;
+}
+
+pre[class*="language-"]::selection,
+pre[class*="language-"] ::selection,
+code[class*="language-"]::selection,
+code[class*="language-"] ::selection {
+  background: #0a3a0a;
+  text-shadow: none;
+}
+
+/* Scrollbar styling for code blocks */
+pre[class*="language-"]::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+  background: #1a3a1a;
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+  background: #2a4a2a;
+}
+
