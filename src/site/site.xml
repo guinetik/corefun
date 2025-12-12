@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/DECORATION/1.8.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd"
-         name="CoreFun">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd" name="CoreFun">
 
     <skin>
         <groupId>org.apache.maven.skins</groupId>
@@ -14,19 +12,48 @@
         <fluidoSkin>
             <!-- Modern dark theme - Vercel inspired -->
             <topBarEnabled>true</topBarEnabled>
-            <sideBarEnabled>true</sideBarEnabled>
+            <sideBarEnabled>false</sideBarEnabled>
+            <topBarIcon>
+                <name>CoreFun</name>
+                <alt>CoreFun</alt>
+                <src>/images/logo.svg</src>
+                <href>/index.html</href>
+            </topBarIcon>
             <navBarStyle>navbar-dark</navBarStyle>
             <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
             <skipGenerationDate>true</skipGenerationDate>
+            <googleAnalytics>
+                <accountId>G-C0RMPKZTK1</accountId>
+                <anonymizeIp>false</anonymizeIp>
+                <forceSSL>false</forceSSL>
+            </googleAnalytics>
+            <twitter>
+                <user>guinetik</user>
+                <showUser>true</showUser>
+                <showFollowers>true</showFollowers>
+            </twitter>
+            <head>
+            <![CDATA[
+                <script src="./js/custom.js" defer></script>
+            ]]>
+        </head>
         </fluidoSkin>
     </custom>
 
     <bannerLeft>
         <name>CoreFun</name>
-        <href>https://github.com/guinetik/corefun</href>
+        <src>images/logo.svg</src>
+        <width>32</width>
+        <height>28</height>
+        <href>index.html</href>
     </bannerLeft>
 
     <body>
+        <head>
+            <![CDATA[
+                <script src="./js/custom.js" defer></script>
+            ]]>
+        </head>
         <breadcrumbs>
             <item name="CoreFun" href="index.html"/>
         </breadcrumbs>
@@ -50,5 +77,6 @@
             <item name="GitHub" href="https://github.com/guinetik/corefun"/>
             <item name="Issues" href="https://github.com/guinetik/corefun/issues"/>
         </menu>
+
     </body>
 </project>
