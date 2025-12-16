@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/DECORATION/1.8.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd"
-         name="CoreFun Library">
+         name="CoreFun Examples">
 
     <skin>
         <groupId>org.apache.maven.skins</groupId>
@@ -29,13 +29,12 @@
     <body>
         <breadcrumbs>
             <item name="CoreFun" href="../index.html"/>
-            <item name="Library" href="index.html"/>
+            <item name="Examples" href="index.html"/>
         </breadcrumbs>
 
         <menu name="Documentation">
             <item name="Javadoc" href="apidocs/index.html"/>
             <item name="Source Code (XRef)" href="xref/index.html"/>
-            <item name="Code Coverage" href="jacoco/index.html"/>
         </menu>
 
         <menu name="Project Information" ref="reports"/>

@@ -33,11 +33,19 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build and test project
-        run: mvn clean install
+      - name: Build and Generate Maven Site
+        # Must run install and site in a SINGLE Maven invocation to avoid MDEP-98 reactor issues
+        # When split into separate commands, Maven rebuilds the reactor and prefers reactor versions
+        # over installed versions, causing "Artifact has not been packaged yet" errors
+        run: mvn clean install site site:stage
 
-      - name: Generate Maven Site
-        run: mvn site site:stage
+      - name: Generate Landing Pages and Inject Styles
+        # Aggregator goals must be invoked directly - they cannot be bound to lifecycle phases
+        # generate-landing-pages: Scans reactor for JaCoCo/JXR reports and creates coverage.html + source-xref.html
+        # inject-styles: Applies terminal theme CSS/JS to all generated HTML in staging directory
+        run: |
+          mvn com.guinetik:terminaljavadocs-maven-plugin:generate-landing-pages \
+              com.guinetik:terminaljavadocs-maven-plugin:inject-styles
 
       - name: Deploy to GitHub Pages branch
         uses: peaceiris/actions-gh-pages@v4

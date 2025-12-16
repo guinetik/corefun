@@ -25,3 +25,8 @@ replay_pid*
 
 target
 CLAUDE.md
+
+# eclipse stuff
+.classpath
+.project
+.settings

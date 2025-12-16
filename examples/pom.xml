@@ -37,6 +37,22 @@
                     <mainClass>com.guinetik.corefun.examples.AllExamples</mainClass>
                 </configuration>
             </plugin>
+
+            <!-- Inject Terminal Javadocs styles -->
+            <plugin>
+                <groupId>com.guinetik</groupId>
+                <artifactId>terminaljavadocs-maven-plugin</artifactId>
+                <version>${terminaljavadocs.version}</version>
+                <executions>
+                    <execution>
+                        <id>inject-styles</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>inject-styles</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
