@@ -49,7 +49,7 @@
     <distributionManagement>
         <site>
             <id>github-pages</id>
-            <url>https://guinetik.github.io/corefun/</url>
+            <url>https://corefun.guinetik.com/</url>
         </site>
     </distributionManagement>
 
