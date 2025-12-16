@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Try.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script>
+<!-- <!-- terminal-javadocs-injected [coverage] -->
+<link rel="stylesheet" href="../../terminal-styles/terminaljavadocs-coverage.min.css">
+<script src="../../terminal-styles/terminaljavadocs.min.js" defer></script>
+</head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CoreFun</a> &gt; <a href="index.source.html" class="el_package">com.guinetik.corefun</a> &gt; <span class="el_source">Try.java</span></div><h1>Try.java</h1><pre class="source lang-java linenums">package com.guinetik.corefun;
+
+import java.util.concurrent.Callable;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+/**
+ * Utility class for executing operations that may fail and converting to Results.
+ * &lt;p&gt;
+ * {@code Try} provides static methods for wrapping operations that might throw
+ * exceptions and converting them to {@link Result} types for functional error handling.
+ * It bridges the gap between exception-based APIs and functional error handling.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Key Features&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;Exception to Result conversion&lt;/b&gt; - Wrap throwing operations in Results&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Multiple error representations&lt;/b&gt; - String messages, full Exceptions, or custom types&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Lazy evaluation&lt;/b&gt; - Defer execution until result is needed&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Safe defaults&lt;/b&gt; - Execute with fallback values on failure&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Example Usage&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * // Execute and get Result with string error
+ * Result&amp;lt;String, String&amp;gt; content = Try.of(() -&amp;gt; Files.readString(path));
+ *
+ * // Chain operations - errors propagate automatically
+ * Result&amp;lt;Integer, String&amp;gt; lineCount = Try.of(() -&amp;gt; Files.readString(path))
+ *     .map(s -&amp;gt; s.split(&quot;\n&quot;).length);
+ *
+ * // Keep full exception for detailed error handling
+ * Result&amp;lt;User, Exception&amp;gt; user = Try.ofException(() -&amp;gt; userService.find(id));
+ *
+ * // Custom error mapping
+ * Result&amp;lt;Config, AppError&amp;gt; config = Try.of(
+ *     () -&amp;gt; loadConfig(path),
+ *     e -&amp;gt; new AppError(&quot;CONFIG_LOAD_FAILED&quot;, e)
+ * );
+ *
+ * // Safe execution with default
+ * int port = Try.getOrDefault(() -&amp;gt; Integer.parseInt(env), 8080);
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+ * @since 0.1.0
+ * @see Result
+ * @see SafeCallable
+ */
+public final class Try {
+
+    private Try() {} // Utility class
+
+    /**
+     * Executes an operation and returns a Result with string error messages.
+     *
+     * @param &lt;T&gt; the result type
+     * @param action the operation to execute
+     * @return Success with the result, or Failure with error message
+     */
+    public static &lt;T&gt; Result&lt;T, String&gt; of(Callable&lt;T&gt; action) {
+        try {
+<span class="fc" id="L63">            return Result.success(action.call());</span>
+<span class="fc" id="L64">        } catch (Exception e) {</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();</span>
+<span class="fc" id="L66">            return Result.failure(message);</span>
+        }
+    }
+
+    /**
+     * Executes an operation and returns a Result preserving the exception.
+     *
+     * @param &lt;T&gt; the result type
+     * @param action the operation to execute
+     * @return Success with the result, or Failure with the exception
+     */
+    public static &lt;T&gt; Result&lt;T, Exception&gt; ofException(Callable&lt;T&gt; action) {
+        try {
+<span class="fc" id="L79">            return Result.success(action.call());</span>
+<span class="fc" id="L80">        } catch (Exception e) {</span>
+<span class="fc" id="L81">            return Result.failure(e);</span>
+        }
+    }
+
+    /**
+     * Executes an operation and returns a Result with custom error mapping.
+     *
+     * @param &lt;T&gt; the result type
+     * @param &lt;F&gt; the failure type
+     * @param action the operation to execute
+     * @param errorMapper function to convert exception to failure type
+     * @return Success with the result, or Failure with mapped error
+     */
+    public static &lt;T, F&gt; Result&lt;T, F&gt; of(Callable&lt;T&gt; action, Function&lt;Exception, F&gt; errorMapper) {
+        try {
+<span class="fc" id="L96">            return Result.success(action.call());</span>
+<span class="fc" id="L97">        } catch (Exception e) {</span>
+<span class="fc" id="L98">            return Result.failure(errorMapper.apply(e));</span>
+        }
+    }
+
+    /**
+     * Executes a runnable and returns a Result indicating success or failure.
+     *
+     * @param action the operation to execute
+     * @return Success with null, or Failure with error message
+     */
+    public static Result&lt;Void, String&gt; run(SafeRunnable action) {
+        try {
+<span class="fc" id="L110">            action.run();</span>
+<span class="fc" id="L111">            return Result.success(null);</span>
+<span class="fc" id="L112">        } catch (Exception e) {</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">            String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();</span>
+<span class="fc" id="L114">            return Result.failure(message);</span>
+        }
+    }
+
+    /**
+     * Lazily wraps an operation, executing only when the result is accessed.
+     *
+     * @param &lt;T&gt; the result type
+     * @param action the operation to execute lazily
+     * @return a Supplier that executes the action when called
+     */
+    public static &lt;T&gt; Supplier&lt;Result&lt;T, String&gt;&gt; lazy(Callable&lt;T&gt; action) {
+<span class="fc" id="L126">        return () -&gt; of(action);</span>
+    }
+
+    /**
+     * Executes an operation, returning a default value on failure.
+     *
+     * @param &lt;T&gt; the result type
+     * @param action the operation to execute
+     * @param defaultValue the default value on failure
+     * @return the result or default value
+     */
+    public static &lt;T&gt; T getOrDefault(Callable&lt;T&gt; action, T defaultValue) {
+        try {
+<span class="fc" id="L139">            return action.call();</span>
+<span class="fc" id="L140">        } catch (Exception e) {</span>
+<span class="fc" id="L141">            return defaultValue;</span>
+        }
+    }
+
+    /**
+     * Executes an operation, returning null on failure.
+     *
+     * @param &lt;T&gt; the result type
+     * @param action the operation to execute
+     * @return the result or null
+     */
+    public static &lt;T&gt; T getOrNull(Callable&lt;T&gt; action) {
+<span class="fc" id="L153">        return getOrDefault(action, null);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

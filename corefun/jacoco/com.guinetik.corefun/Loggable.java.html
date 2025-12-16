@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Loggable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script>
+<!-- <!-- terminal-javadocs-injected [coverage] -->
+<link rel="stylesheet" href="../../terminal-styles/terminaljavadocs-coverage.min.css">
+<script src="../../terminal-styles/terminaljavadocs.min.js" defer></script>
+</head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CoreFun</a> &gt; <a href="index.source.html" class="el_package">com.guinetik.corefun</a> &gt; <span class="el_source">Loggable.java</span></div><h1>Loggable.java</h1><pre class="source lang-java linenums">package com.guinetik.corefun;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+/**
+ * Interface providing logging capabilities to implementing classes.
+ * &lt;p&gt;
+ * {@code Loggable} is framework-agnostic - implement {@link #logger()} to return
+ * a {@link Logger} that delegates to your preferred logging framework (SLF4J, Log4j,
+ * java.util.logging, etc.). This allows library code to emit logs without depending
+ * on any specific logging implementation.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Design Philosophy&lt;/h2&gt;
+ * &lt;p&gt;
+ * Rather than depending on a logging facade like SLF4J, CoreFun uses a simple
+ * functional approach: you provide the logging functions. This means:
+ * &lt;/p&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;Zero dependencies on logging frameworks&lt;/li&gt;
+ *   &lt;li&gt;Easy integration with any logging system&lt;/li&gt;
+ *   &lt;li&gt;Testable - inject mock loggers for testing&lt;/li&gt;
+ *   &lt;li&gt;Flexible - use lambdas, method references, or custom implementations&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Example with SLF4J&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * public class MyService implements Loggable {
+ *     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(MyService.class);
+ *
+ *     &amp;#64;Override
+ *     public Logger logger() {
+ *         return Logger.of(LOG::info, LOG::warn, LOG::error);
+ *     }
+ *
+ *     public void doWork() {
+ *         logger().info(&quot;Starting work&quot;);
+ *         // ...
+ *         logger().info(&quot;Work completed&quot;);
+ *     }
+ * }
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * &lt;h2&gt;Example with java.util.logging&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * public class JulService implements Loggable {
+ *     private static final java.util.logging.Logger LOG =
+ *         java.util.logging.Logger.getLogger(JulService.class.getName());
+ *
+ *     &amp;#64;Override
+ *     public Logger logger() {
+ *         return Logger.of(
+ *             msg -&amp;gt; LOG.info(msg),
+ *             msg -&amp;gt; LOG.warning(msg),
+ *             msg -&amp;gt; LOG.severe(msg)
+ *         );
+ *     }
+ * }
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * &lt;h2&gt;Example with Simple println&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * public class SimpleService implements Loggable {
+ *     &amp;#64;Override
+ *     public Logger logger() {
+ *         return Logger.println();
+ *     }
+ * }
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * &lt;h2&gt;Tagged Logging&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * Logger tagged = Logger.tagged(&quot;MyComponent&quot;, Logger.println());
+ * tagged.info(&quot;Starting&quot;);  // prints: [MyComponent] Starting
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+ * @since 0.1.0
+ * @see SafeExecutor
+ */
+public interface Loggable {
+
+    /**
+     * Returns the logger for this instance.
+     * Override to provide a logger backed by your preferred framework.
+     *
+     * @return a Logger instance
+     */
+    Logger logger();
+
+    /**
+     * A simple, framework-agnostic logger interface.
+     * &lt;p&gt;
+     * Logger provides a minimal set of logging methods that can be implemented
+     * by delegating to any logging framework. Factory methods are provided for
+     * common use cases.
+     * &lt;/p&gt;
+     *
+     * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+     * @since 0.1.0
+     */
+    interface Logger {
+
+        /**
+         * Logs an informational message.
+         *
+         * @param message the message to log
+         */
+        void info(String message);
+
+        /**
+         * Logs a warning message.
+         *
+         * @param message the message to log
+         */
+        void warn(String message);
+
+        /**
+         * Logs an error message.
+         *
+         * @param message the message to log
+         */
+        void error(String message);
+
+        /**
+         * Logs an error message with an exception.
+         *
+         * @param message the message to log
+         * @param throwable the exception to log
+         */
+        void error(String message, Throwable throwable);
+
+        /**
+         * Logs a debug message.
+         *
+         * @param message the message to log
+         */
+        default void debug(String message) {
+            // No-op by default, override if needed
+<span class="fc" id="L141">        }</span>
+
+        /**
+         * Logs a trace message.
+         *
+         * @param message the message to log
+         */
+        default void trace(String message) {
+            // No-op by default, override if needed
+<span class="fc" id="L150">        }</span>
+
+        /**
+         * Creates a Logger from individual log functions.
+         *
+         * @param info function for info messages
+         * @param warn function for warn messages
+         * @param error function for error messages
+         * @return a configured Logger
+         */
+        static Logger of(Consumer&lt;String&gt; info,
+                         Consumer&lt;String&gt; warn,
+                         Consumer&lt;String&gt; error) {
+<span class="fc" id="L163">            return new Logger() {</span>
+<span class="fc" id="L164">                @Override public void info(String message) { info.accept(message); }</span>
+<span class="fc" id="L165">                @Override public void warn(String message) { warn.accept(message); }</span>
+<span class="fc" id="L166">                @Override public void error(String message) { error.accept(message); }</span>
+                @Override public void error(String message, Throwable t) {
+<span class="fc" id="L168">                    error.accept(message + &quot;: &quot; + t.getMessage());</span>
+<span class="fc" id="L169">                }</span>
+            };
+        }
+
+        /**
+         * Creates a Logger with error-with-throwable support.
+         *
+         * @param info function for info messages
+         * @param warn function for warn messages
+         * @param error function for error messages
+         * @param errorWithThrowable function for error messages with throwables
+         * @return a configured Logger
+         */
+        static Logger of(Consumer&lt;String&gt; info,
+                         Consumer&lt;String&gt; warn,
+                         Consumer&lt;String&gt; error,
+                         BiConsumer&lt;String, Throwable&gt; errorWithThrowable) {
+<span class="fc" id="L186">            return new Logger() {</span>
+<span class="fc" id="L187">                @Override public void info(String message) { info.accept(message); }</span>
+<span class="nc" id="L188">                @Override public void warn(String message) { warn.accept(message); }</span>
+<span class="nc" id="L189">                @Override public void error(String message) { error.accept(message); }</span>
+                @Override public void error(String message, Throwable t) {
+<span class="fc" id="L191">                    errorWithThrowable.accept(message, t);</span>
+<span class="fc" id="L192">                }</span>
+            };
+        }
+
+        /**
+         * Creates a Logger that prints to stdout/stderr.
+         *
+         * @return a println-based Logger
+         */
+        static Logger println() {
+<span class="fc" id="L202">            return new Logger() {</span>
+                @Override public void info(String message) {
+<span class="fc" id="L204">                    System.out.println(&quot;[INFO] &quot; + message);</span>
+<span class="fc" id="L205">                }</span>
+                @Override public void warn(String message) {
+<span class="fc" id="L207">                    System.out.println(&quot;[WARN] &quot; + message);</span>
+<span class="fc" id="L208">                }</span>
+                @Override public void error(String message) {
+<span class="fc" id="L210">                    System.err.println(&quot;[ERROR] &quot; + message);</span>
+<span class="fc" id="L211">                }</span>
+                @Override public void error(String message, Throwable t) {
+<span class="fc" id="L213">                    System.err.println(&quot;[ERROR] &quot; + message);</span>
+<span class="fc" id="L214">                    t.printStackTrace(System.err);</span>
+<span class="fc" id="L215">                }</span>
+                @Override public void debug(String message) {
+<span class="fc" id="L217">                    System.out.println(&quot;[DEBUG] &quot; + message);</span>
+<span class="fc" id="L218">                }</span>
+            };
+        }
+
+        /**
+         * Creates a no-op Logger that discards all messages.
+         *
+         * @return a silent Logger
+         */
+        static Logger noop() {
+<span class="fc" id="L228">            return new Logger() {</span>
+<span class="fc" id="L229">                @Override public void info(String message) {}</span>
+<span class="fc" id="L230">                @Override public void warn(String message) {}</span>
+<span class="fc" id="L231">                @Override public void error(String message) {}</span>
+<span class="fc" id="L232">                @Override public void error(String message, Throwable t) {}</span>
+            };
+        }
+
+        /**
+         * Creates a Logger that prefixes all messages with a tag.
+         *
+         * @param tag the prefix tag (typically class name)
+         * @param delegate the Logger to delegate to
+         * @return a tagged Logger
+         */
+        static Logger tagged(String tag, Logger delegate) {
+<span class="fc" id="L244">            return new Logger() {</span>
+                @Override public void info(String message) {
+<span class="fc" id="L246">                    delegate.info(&quot;[&quot; + tag + &quot;] &quot; + message);</span>
+<span class="fc" id="L247">                }</span>
+                @Override public void warn(String message) {
+<span class="fc" id="L249">                    delegate.warn(&quot;[&quot; + tag + &quot;] &quot; + message);</span>
+<span class="fc" id="L250">                }</span>
+                @Override public void error(String message) {
+<span class="fc" id="L252">                    delegate.error(&quot;[&quot; + tag + &quot;] &quot; + message);</span>
+<span class="fc" id="L253">                }</span>
+                @Override public void error(String message, Throwable t) {
+<span class="fc" id="L255">                    delegate.error(&quot;[&quot; + tag + &quot;] &quot; + message, t);</span>
+<span class="fc" id="L256">                }</span>
+                @Override public void debug(String message) {
+<span class="fc" id="L258">                    delegate.debug(&quot;[&quot; + tag + &quot;] &quot; + message);</span>
+<span class="fc" id="L259">                }</span>
+            };
+        }
+    }
+
+    /**
+     * Creates a Loggable that uses the given Logger.
+     *
+     * @param logger the Logger to use
+     * @return a Loggable instance
+     */
+    static Loggable of(Logger logger) {
+<span class="fc" id="L271">        return () -&gt; logger;</span>
+    }
+
+    /**
+     * Creates a Loggable that prints to stdout/stderr.
+     *
+     * @return a println-based Loggable
+     */
+    static Loggable println() {
+<span class="fc" id="L280">        return Logger::println;</span>
+    }
+
+    /**
+     * Creates a no-op Loggable.
+     *
+     * @return a silent Loggable
+     */
+    static Loggable noop() {
+<span class="fc" id="L289">        return Logger::noop;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Timing.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script>
+<!-- <!-- terminal-javadocs-injected [coverage] -->
+<link rel="stylesheet" href="../../terminal-styles/terminaljavadocs-coverage.min.css">
+<script src="../../terminal-styles/terminaljavadocs.min.js" defer></script>
+</head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CoreFun</a> &gt; <a href="index.source.html" class="el_package">com.guinetik.corefun</a> &gt; <span class="el_source">Timing.java</span></div><h1>Timing.java</h1><pre class="source lang-java linenums">package com.guinetik.corefun;
+
+import java.util.concurrent.Callable;
+
+/**
+ * Interface for timing the execution of operations.
+ * &lt;p&gt;
+ * {@code Timing} provides methods for measuring execution time with pluggable
+ * logging. Implement {@link #onTimed(String, long)} to receive timing results.
+ * This is useful for performance monitoring, profiling, and debugging.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Key Features&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;Automatic timing&lt;/b&gt; - Execution time measured in milliseconds&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Pluggable reporting&lt;/b&gt; - Implement {@link #onTimed} for custom handling&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Exception safe&lt;/b&gt; - Timing reported even if operation throws&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Multiple operation types&lt;/b&gt; - Support for Callable, Runnable, SafeRunnable&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Example Usage&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * public class MyService implements Timing {
+ *     &amp;#64;Override
+ *     public void onTimed(String description, long milliseconds) {
+ *         logger.info(&quot;{} took {}ms&quot;, description, milliseconds);
+ *     }
+ *
+ *     public User loadUser(long id) {
+ *         return timed(&quot;Load user &quot; + id, () -&amp;gt; userRepository.findById(id));
+ *     }
+ *
+ *     public void sendNotification() {
+ *         timedVoid(&quot;Send notification&quot;, () -&amp;gt; notificationService.send());
+ *     }
+ * }
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * &lt;h2&gt;Metrics Collection&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * // Report to metrics system
+ * Timing metricsTimer = (desc, ms) -&amp;gt;
+ *     metrics.recordTiming(&quot;operation.&quot; + desc, ms, TimeUnit.MILLISECONDS);
+ *
+ * // Use the timer
+ * metricsTimer.timed(&quot;database.query&quot;, () -&amp;gt; db.execute(query));
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+ * @since 0.1.0
+ * @see SafeExecutor
+ */
+public interface Timing {
+
+    /**
+     * Called after an operation completes with timing information.
+     * Implement this to log, record metrics, or otherwise handle timing data.
+     *
+     * @param description the operation description
+     * @param milliseconds the execution time in milliseconds
+     */
+    void onTimed(String description, long milliseconds);
+
+    /**
+     * Executes a callable and times its execution.
+     *
+     * @param &lt;T&gt; the return type
+     * @param description description of the operation (for logging)
+     * @param action the operation to execute
+     * @return the result of the callable
+     * @throws SafeException if the operation throws an exception
+     */
+    default &lt;T&gt; T timed(String description, Callable&lt;T&gt; action) {
+<span class="fc" id="L74">        long startTime = System.nanoTime();</span>
+        try {
+<span class="fc" id="L76">            return action.call();</span>
+<span class="fc" id="L77">        } catch (Exception e) {</span>
+<span class="fc" id="L78">            throw SafeException.wrap(description, e);</span>
+        } finally {
+<span class="fc" id="L80">            long durationMs = (System.nanoTime() - startTime) / 1_000_000;</span>
+<span class="fc" id="L81">            onTimed(description, durationMs);</span>
+        }
+    }
+
+    /**
+     * Executes a runnable and times its execution.
+     *
+     * @param description description of the operation (for logging)
+     * @param action the operation to execute
+     * @throws SafeException if the operation throws an exception
+     */
+    default void timedVoid(String description, Runnable action) {
+<span class="fc" id="L93">        timed(description, () -&gt; {</span>
+<span class="fc" id="L94">            action.run();</span>
+<span class="fc" id="L95">            return null;</span>
+        });
+<span class="fc" id="L97">    }</span>
+
+    /**
+     * Executes a SafeRunnable and times its execution.
+     *
+     * @param description description of the operation (for logging)
+     * @param action the operation to execute
+     * @throws SafeException if the operation throws an exception
+     */
+    default void timedSafe(String description, SafeRunnable action) {
+<span class="fc" id="L107">        timed(description, () -&gt; {</span>
+<span class="fc" id="L108">            action.run();</span>
+<span class="fc" id="L109">            return null;</span>
+        });
+<span class="fc" id="L111">    }</span>
+
+    /**
+     * Creates a Timing instance that prints to standard output.
+     *
+     * @return a Timing that prints timing info
+     */
+    static Timing println() {
+<span class="fc" id="L119">        return (description, ms) -&gt; System.out.println(description + &quot; completed in &quot; + ms + &quot;ms&quot;);</span>
+    }
+
+    /**
+     * Creates a Timing instance that discards timing information.
+     *
+     * @return a no-op Timing
+     */
+    static Timing noop() {
+<span class="fc" id="L128">        return (description, ms) -&gt; {};</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

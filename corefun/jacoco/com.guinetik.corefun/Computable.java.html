@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Computable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script>
+<!-- <!-- terminal-javadocs-injected [coverage] -->
+<link rel="stylesheet" href="../../terminal-styles/terminaljavadocs-coverage.min.css">
+<script src="../../terminal-styles/terminaljavadocs.min.js" defer></script>
+</head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CoreFun</a> &gt; <a href="index.source.html" class="el_package">com.guinetik.corefun</a> &gt; <span class="el_source">Computable.java</span></div><h1>Computable.java</h1><pre class="source lang-java linenums">package com.guinetik.corefun;
+
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+/**
+ * A value wrapper that provides functional composition operations.
+ * &lt;p&gt;
+ * {@code Computable} encapsulates a value and provides methods for transforming,
+ * validating, and combining values in a functional style. It promotes immutability
+ * and composability, making it useful for data processing pipelines and building
+ * domain-specific languages (DSLs).
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Key Features&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;Immutable transformations&lt;/b&gt; - All operations return new instances&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Fluent API&lt;/b&gt; - Chain operations for readable data pipelines&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Validation&lt;/b&gt; - Check values with predicates using {@link #isValid} and {@link #filter}&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Combination&lt;/b&gt; - Combine multiple values with {@link #combine}&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Side effects&lt;/b&gt; - Debug with {@link #peek} without breaking the chain&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Example Usage&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * // Simple transformation
+ * Computable&amp;lt;String&amp;gt; name = Computable.of(&quot;hello&quot;);
+ * Computable&amp;lt;Integer&amp;gt; length = name.map(String::length);
+ * System.out.println(length.getValue()); // prints 5
+ *
+ * // Chained transformations
+ * String result = Computable.of(100)
+ *     .map(n -&amp;gt; n * 2)
+ *     .filter(n -&amp;gt; n &amp;gt; 0, () -&amp;gt; 0)
+ *     .map(n -&amp;gt; &quot;Result: &quot; + n)
+ *     .getValue();
+ *
+ * // Combining values
+ * Computable&amp;lt;Integer&amp;gt; a = Computable.of(10);
+ * Computable&amp;lt;Integer&amp;gt; b = Computable.of(5);
+ * int sum = a.combine(b, Integer::sum).getValue(); // 15
+ *
+ * // Validation
+ * boolean valid = Computable.of(email)
+ *     .isValid(e -&amp;gt; e.contains(&quot;@&quot;));
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * @param &lt;T&gt; the type of the value being managed
+ * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+ * @since 0.1.0
+ * @see DefaultComputable
+ */
+public interface Computable&lt;T&gt; {
+
+    /**
+     * Creates a new Computable wrapping the given value.
+     *
+     * @param value the value to wrap
+     * @param &lt;T&gt; the type of the value
+     * @return a new Computable containing the value
+     */
+    static &lt;T&gt; Computable&lt;T&gt; of(T value) {
+<span class="fc" id="L66">        return new DefaultComputable&lt;&gt;(value);</span>
+    }
+
+    /**
+     * Retrieves the value managed by this computable.
+     *
+     * @return the current value
+     */
+    T getValue();
+
+    /**
+     * Transforms the value using the provided function.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Computable&amp;lt;String&amp;gt; original = Computable.of(&quot;hello&quot;);
+     * Computable&amp;lt;Integer&amp;gt; length = original.map(String::length);
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param &lt;R&gt; the type of the result
+     * @param transformer a function to transform the value
+     * @return a new Computable with the transformed value
+     */
+    default &lt;R&gt; Computable&lt;R&gt; map(Function&lt;? super T, ? extends R&gt; transformer) {
+<span class="fc" id="L90">        return new DefaultComputable&lt;&gt;(transformer.apply(getValue()));</span>
+    }
+
+    /**
+     * Applies a transformation that returns a Computable and flattens the result.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Computable&amp;lt;Integer&amp;gt; age = Computable.of(30);
+     * Computable&amp;lt;String&amp;gt; status = age.flatMap(a -&amp;gt; Computable.of(a &amp;gt;= 18 ? &quot;Adult&quot; : &quot;Minor&quot;));
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param &lt;R&gt; the type of the result
+     * @param transformer a function that returns a Computable
+     * @return the Computable returned by the transformer
+     */
+    default &lt;R&gt; Computable&lt;R&gt; flatMap(Function&lt;? super T, Computable&lt;R&gt;&gt; transformer) {
+<span class="fc" id="L107">        return transformer.apply(getValue());</span>
+    }
+
+    /**
+     * Validates the value using the specified predicate.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Computable&amp;lt;Integer&amp;gt; age = Computable.of(25);
+     * boolean isAdult = age.isValid(a -&amp;gt; a &amp;gt;= 18);
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param validator a predicate to test the value
+     * @return true if the value passes validation
+     */
+    default boolean isValid(Predicate&lt;T&gt; validator) {
+<span class="fc" id="L123">        return validator.test(getValue());</span>
+    }
+
+    /**
+     * Filters the value, returning a default if the predicate fails.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Computable&amp;lt;Integer&amp;gt; age = Computable.of(15);
+     * Computable&amp;lt;Integer&amp;gt; adultAge = age.filter(a -&amp;gt; a &amp;gt;= 18, () -&amp;gt; 18);
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param predicate the condition to test
+     * @param defaultValue supplier for the default value if test fails
+     * @return this Computable if predicate passes, otherwise a new one with default
+     */
+    default Computable&lt;T&gt; filter(Predicate&lt;T&gt; predicate, Supplier&lt;T&gt; defaultValue) {
+<span class="fc bfc" id="L140" title="All 2 branches covered.">        return predicate.test(getValue()) ? this : new DefaultComputable&lt;&gt;(defaultValue.get());</span>
+    }
+
+    /**
+     * Reduces the value by combining it with an initial value.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Computable&amp;lt;String&amp;gt; name = Computable.of(&quot;John&quot;);
+     * String greeting = name.reduce(&quot;Hello, &quot;, (acc, n) -&amp;gt; acc + n);
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param &lt;R&gt; the type of the result
+     * @param initialValue the initial value for reduction
+     * @param accumulator the reduction function
+     * @return the result of the reduction
+     */
+    default &lt;R&gt; R reduce(R initialValue, BiFunction&lt;R, T, R&gt; accumulator) {
+<span class="fc" id="L158">        return accumulator.apply(initialValue, getValue());</span>
+    }
+
+    /**
+     * Combines this value with another Computable's value.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Computable&amp;lt;Integer&amp;gt; a = Computable.of(10);
+     * Computable&amp;lt;Integer&amp;gt; b = Computable.of(5);
+     * Computable&amp;lt;Integer&amp;gt; sum = a.combine(b, Integer::sum);
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param &lt;U&gt; the type of the other value
+     * @param &lt;R&gt; the type of the result
+     * @param other another Computable
+     * @param combiner function to combine the values
+     * @return a new Computable with the combined result
+     */
+    default &lt;U, R&gt; Computable&lt;R&gt; combine(Computable&lt;U&gt; other, BiFunction&lt;T, U, R&gt; combiner) {
+<span class="fc" id="L178">        return new DefaultComputable&lt;&gt;(combiner.apply(this.getValue(), other.getValue()));</span>
+    }
+
+    /**
+     * Performs an action on the value without altering it.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Computable&amp;lt;String&amp;gt; name = Computable.of(&quot;Alice&quot;);
+     * name.peek(System.out::println).map(String::toUpperCase);
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param action a consumer to perform on the value
+     * @return this Computable for chaining
+     */
+    default Computable&lt;T&gt; peek(Consumer&lt;T&gt; action) {
+<span class="fc" id="L194">        action.accept(getValue());</span>
+<span class="fc" id="L195">        return this;</span>
+    }
+
+    /**
+     * Returns the value if non-null, otherwise returns the default.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Computable&amp;lt;String&amp;gt; nullable = Computable.of(null);
+     * String name = nullable.orElse(&quot;Unknown&quot;);
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param other the default value
+     * @return the value or the default
+     */
+    default T orElse(T other) {
+<span class="fc" id="L211">        T value = getValue();</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        return value != null ? value : other;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

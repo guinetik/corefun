@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SafeExecutor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script>
+<!-- <!-- terminal-javadocs-injected [coverage] -->
+<link rel="stylesheet" href="../../terminal-styles/terminaljavadocs-coverage.min.css">
+<script src="../../terminal-styles/terminaljavadocs.min.js" defer></script>
+</head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CoreFun</a> &gt; <a href="index.source.html" class="el_package">com.guinetik.corefun</a> &gt; <span class="el_source">SafeExecutor.java</span></div><h1>SafeExecutor.java</h1><pre class="source lang-java linenums">package com.guinetik.corefun;
+
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+
+/**
+ * Provides safe execution of operations with timing, logging, and error handling.
+ * &lt;p&gt;
+ * {@code SafeExecutor} extends {@link Loggable} and combines timing, logging, and
+ * exception handling into a single interface for safely executing operations.
+ * By default, it logs operation start, completion (with timing), and errors.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Key Features&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;Automatic timing&lt;/b&gt; - Every operation is timed and logged&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Structured logging&lt;/b&gt; - Consistent start/complete/error messages&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Exception wrapping&lt;/b&gt; - Checked exceptions wrapped in {@link SafeException}&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Result support&lt;/b&gt; - Use {@link #safelyResult} for functional error handling&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Customizable hooks&lt;/b&gt; - Override {@link #onStart}, {@link #onComplete}, {@link #onError}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Implementation Pattern&lt;/h2&gt;
+ * &lt;p&gt;
+ * Implement this interface in service classes to get automatic logging and timing
+ * for all operations. The interface-with-default-methods pattern means you only need
+ * to implement {@link #logger()}.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Example with SLF4J&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * public class DataProcessor implements SafeExecutor {
+ *     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(DataProcessor.class);
+ *
+ *     &amp;#64;Override
+ *     public Loggable.Logger logger() {
+ *         return Loggable.Logger.of(LOG::info, LOG::warn, LOG::error);
+ *     }
+ *
+ *     public Data process() {
+ *         return safely(&quot;Process data&quot;, () -&amp;gt; {
+ *             // processing logic - automatically logged
+ *             return processedData;
+ *         });
+ *     }
+ * }
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * &lt;h2&gt;Example with Simple println&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * public class SimpleProcessor implements SafeExecutor {
+ *     &amp;#64;Override
+ *     public Loggable.Logger logger() {
+ *         return Loggable.Logger.println();
+ *     }
+ *
+ *     public void doWork() {
+ *         safely(&quot;Do work&quot;, () -&amp;gt; performWork());
+ *         // Logs: [INFO] Executing: Do work
+ *         // Logs: [INFO] Completed: Do work in 123ms
+ *     }
+ * }
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * &lt;h2&gt;Result-Based Error Handling&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * Result&amp;lt;Data, String&amp;gt; result = safelyResult(&quot;Load data&quot;, () -&amp;gt; loadData());
+ * result.fold(
+ *     error -&amp;gt; showError(error),
+ *     data -&amp;gt; displayData(data)
+ * );
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+ * @since 0.1.0
+ * @see Loggable
+ * @see Timing
+ * @see SafeException
+ * @see Result
+ */
+public interface SafeExecutor extends Loggable {
+
+    /**
+     * Called when an operation starts. Default implementation logs via {@link #logger()}.
+     *
+     * @param description the operation description
+     */
+    default void onStart(String description) {
+<span class="fc" id="L89">        logger().info(&quot;Executing: &quot; + description);</span>
+<span class="fc" id="L90">    }</span>
+
+    /**
+     * Called when an operation completes successfully. Default implementation logs via {@link #logger()}.
+     *
+     * @param description the operation description
+     * @param milliseconds the execution time
+     */
+    default void onComplete(String description, long milliseconds) {
+<span class="fc" id="L99">        logger().info(&quot;Completed: &quot; + description + &quot; in &quot; + milliseconds + &quot;ms&quot;);</span>
+<span class="fc" id="L100">    }</span>
+
+    /**
+     * Called when an operation fails. Default implementation logs via {@link #logger()}.
+     *
+     * @param description the operation description
+     * @param e the exception that occurred
+     */
+    default void onError(String description, Exception e) {
+<span class="fc" id="L109">        logger().error(&quot;Failed: &quot; + description, e);</span>
+<span class="fc" id="L110">    }</span>
+
+    /**
+     * Executes a callable safely with timing and error handling.
+     *
+     * @param &lt;T&gt; the return type
+     * @param description description of the operation
+     * @param action the operation to execute
+     * @return the result of the operation
+     * @throws SafeException if the operation fails
+     */
+    default &lt;T&gt; T safely(String description, Callable&lt;T&gt; action) {
+<span class="fc" id="L122">        onStart(description);</span>
+<span class="fc" id="L123">        long startTime = System.nanoTime();</span>
+        try {
+<span class="fc" id="L125">            T result = action.call();</span>
+<span class="fc" id="L126">            long durationMs = (System.nanoTime() - startTime) / 1_000_000;</span>
+<span class="fc" id="L127">            onComplete(description, durationMs);</span>
+<span class="fc" id="L128">            return result;</span>
+<span class="fc" id="L129">        } catch (Exception e) {</span>
+<span class="fc" id="L130">            onError(description, e);</span>
+<span class="fc" id="L131">            throw SafeException.wrap(description, e);</span>
+        }
+    }
+
+    /**
+     * Executes a runnable safely with timing and error handling.
+     *
+     * @param description description of the operation
+     * @param action the operation to execute
+     * @throws SafeException if the operation fails
+     */
+    default void safelyVoid(String description, Runnable action) {
+<span class="fc" id="L143">        safely(description, () -&gt; {</span>
+<span class="fc" id="L144">            action.run();</span>
+<span class="fc" id="L145">            return null;</span>
+        });
+<span class="fc" id="L147">    }</span>
+
+    /**
+     * Executes a SafeRunnable safely with timing and error handling.
+     *
+     * @param description description of the operation
+     * @param action the operation to execute
+     * @throws SafeException if the operation fails
+     */
+    default void safelySafe(String description, SafeRunnable action) {
+<span class="fc" id="L157">        safely(description, () -&gt; {</span>
+<span class="fc" id="L158">            action.run();</span>
+<span class="fc" id="L159">            return null;</span>
+        });
+<span class="fc" id="L161">    }</span>
+
+    /**
+     * Executes an operation and returns a Result instead of throwing.
+     *
+     * @param &lt;T&gt; the return type
+     * @param description description of the operation
+     * @param action the operation to execute
+     * @return Success with result, or Failure with error message
+     */
+    default &lt;T&gt; Result&lt;T, String&gt; safelyResult(String description, Callable&lt;T&gt; action) {
+<span class="fc" id="L172">        onStart(description);</span>
+<span class="fc" id="L173">        long startTime = System.nanoTime();</span>
+        try {
+<span class="fc" id="L175">            T result = action.call();</span>
+<span class="fc" id="L176">            long durationMs = (System.nanoTime() - startTime) / 1_000_000;</span>
+<span class="fc" id="L177">            onComplete(description, durationMs);</span>
+<span class="fc" id="L178">            return Result.success(result);</span>
+<span class="fc" id="L179">        } catch (Exception e) {</span>
+<span class="fc" id="L180">            onError(description, e);</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">            String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();</span>
+<span class="fc" id="L182">            return Result.failure(description + &quot; failed: &quot; + message);</span>
+        }
+    }
+
+    /**
+     * Creates a SafeExecutor with the given logger.
+     *
+     * @param logger the logger to use
+     * @return a SafeExecutor that uses the provided logger
+     */
+    static SafeExecutor withLogger(Loggable.Logger logger) {
+<span class="fc" id="L193">        return () -&gt; logger;</span>
+    }
+
+    /**
+     * Creates a SafeExecutor that prints to standard output.
+     *
+     * @return a SafeExecutor that prints execution info
+     */
+    static SafeExecutor println() {
+<span class="fc" id="L202">        return withLogger(Loggable.Logger.println());</span>
+    }
+
+    /**
+     * Creates a no-op SafeExecutor that doesn't log.
+     *
+     * @return a silent SafeExecutor
+     */
+    static SafeExecutor noop() {
+<span class="fc" id="L211">        return withLogger(Loggable.Logger.noop());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Result.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script>
+<!-- <!-- terminal-javadocs-injected [coverage] -->
+<link rel="stylesheet" href="../../terminal-styles/terminaljavadocs-coverage.min.css">
+<script src="../../terminal-styles/terminaljavadocs.min.js" defer></script>
+</head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CoreFun</a> &gt; <a href="index.source.html" class="el_package">com.guinetik.corefun</a> &gt; <span class="el_source">Result.java</span></div><h1>Result.java</h1><pre class="source lang-java linenums">package com.guinetik.corefun;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+/**
+ * A functional container representing either a success or failure outcome.
+ * &lt;p&gt;
+ * {@code Result} is an Either-style monad that encapsulates either a successful value
+ * or an error, providing a functional approach to error handling without exceptions.
+ * This eliminates the need for null checks and exception handling in business logic,
+ * promoting cleaner, more composable code.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Key Features&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;Type-safe error handling&lt;/b&gt; - Errors are part of the type signature&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Functional composition&lt;/b&gt; - Chain operations with {@link #map} and {@link #flatMap}&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Pattern matching&lt;/b&gt; - Use {@link #fold} to handle both cases uniformly&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Validation support&lt;/b&gt; - Combine with {@link #validate} for input validation&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Recovery&lt;/b&gt; - Handle failures gracefully with {@link #recover}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Example Usage&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * Result&amp;lt;User, String&amp;gt; result = findUser(id);
+ *
+ * // Pattern matching with fold
+ * String message = result.fold(
+ *     error -&amp;gt; &quot;Error: &quot; + error,
+ *     user -&amp;gt; &quot;Found: &quot; + user.getName()
+ * );
+ *
+ * // Chaining operations
+ * Result&amp;lt;String, String&amp;gt; greeting = result
+ *     .map(user -&amp;gt; user.getName())
+ *     .map(name -&amp;gt; &quot;Hello, &quot; + name);
+ *
+ * // Validation
+ * Result&amp;lt;Integer, String&amp;gt; validAge = Result.success(age)
+ *     .validate(a -&amp;gt; a &amp;gt;= 0 &amp;amp;&amp;amp; a &amp;lt;= 150, a -&amp;gt; &quot;Invalid age: &quot; + a);
+ *
+ * // Recovery from errors
+ * Result&amp;lt;User, String&amp;gt; userOrGuest = findUser(id)
+ *     .recover(error -&amp;gt; Result.success(guestUser));
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * @param &lt;S&gt; the type of the success value
+ * @param &lt;F&gt; the type of the failure value
+ * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+ * @since 0.1.0
+ * @see Try
+ * @see SafeCallable#toResult()
+ */
+public abstract class Result&lt;S, F&gt; {
+
+    // Private constructor to prevent external subclassing
+<span class="fc" id="L61">    Result() {}</span>
+
+    /**
+     * Creates a successful Result containing the given value.
+     *
+     * @param value the success value
+     * @param &lt;S&gt; success type
+     * @param &lt;F&gt; failure type
+     * @return a successful Result
+     */
+    public static &lt;S, F&gt; Result&lt;S, F&gt; success(S value) {
+<span class="fc" id="L72">        return new Success&lt;&gt;(value);</span>
+    }
+
+    /**
+     * Creates a failed Result containing the given error.
+     *
+     * @param error the failure value
+     * @param &lt;S&gt; success type
+     * @param &lt;F&gt; failure type
+     * @return a failed Result
+     */
+    public static &lt;S, F&gt; Result&lt;S, F&gt; failure(F error) {
+<span class="fc" id="L84">        return new Failure&lt;&gt;(error);</span>
+    }
+
+    /**
+     * Returns true if this Result represents a success.
+     *
+     * @return true if success, false if failure
+     */
+    public abstract boolean isSuccess();
+
+    /**
+     * Returns true if this Result represents a failure.
+     *
+     * @return true if failure, false if success
+     */
+    public abstract boolean isFailure();
+
+    /**
+     * Gets the success value. Throws if this is a failure.
+     *
+     * @return the success value
+     * @throws IllegalStateException if this is a failure
+     */
+    public abstract S get();
+
+    /**
+     * Gets the failure value. Throws if this is a success.
+     *
+     * @return the failure value
+     * @throws IllegalStateException if this is a success
+     */
+    public abstract F getError();
+
+    /**
+     * Applies one of two functions depending on the Result state.
+     * This is the primary way to extract values from a Result.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * String message = result.fold(
+     *     error -&amp;gt; &quot;Failed: &quot; + error,
+     *     value -&amp;gt; &quot;Success: &quot; + value
+     * );
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param &lt;R&gt; the return type
+     * @param onFailure function to apply if failure
+     * @param onSuccess function to apply if success
+     * @return the result of applying the appropriate function
+     */
+    public abstract &lt;R&gt; R fold(Function&lt;? super F, ? extends R&gt; onFailure,
+                                Function&lt;? super S, ? extends R&gt; onSuccess);
+
+    /**
+     * Transforms the success value using the provided function.
+     * If this is a failure, returns a new failure with the same error.
+     *
+     * @param &lt;T&gt; the new success type
+     * @param mapper function to transform the success value
+     * @return a new Result with the transformed value
+     */
+    public abstract &lt;T&gt; Result&lt;T, F&gt; map(Function&lt;? super S, ? extends T&gt; mapper);
+
+    /**
+     * Transforms the success value with a function that returns a Result.
+     * Useful for chaining operations that might fail.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Result&amp;lt;User, String&amp;gt; user = findUser(id);
+     * Result&amp;lt;Account, String&amp;gt; account = user.flatMap(u -&amp;gt; findAccount(u.getAccountId()));
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param &lt;T&gt; the new success type
+     * @param mapper function that returns a Result
+     * @return the Result from the mapper, or a failure
+     */
+    public abstract &lt;T&gt; Result&lt;T, F&gt; flatMap(Function&lt;? super S, Result&lt;T, F&gt;&gt; mapper);
+
+    /**
+     * Transforms the failure value using the provided function.
+     *
+     * @param &lt;E&gt; the new failure type
+     * @param mapper function to transform the failure value
+     * @return a new Result with the transformed failure
+     */
+    public abstract &lt;E&gt; Result&lt;S, E&gt; mapFailure(Function&lt;? super F, ? extends E&gt; mapper);
+
+    /**
+     * Returns the success value or a default if this is a failure.
+     *
+     * @param defaultValue the default to return on failure
+     * @return success value or default
+     */
+    public abstract S getOrElse(S defaultValue);
+
+    /**
+     * Returns the success value or computes a default if this is a failure.
+     *
+     * @param supplier supplies the default value
+     * @return success value or computed default
+     */
+    public abstract S getOrElseGet(Supplier&lt;? extends S&gt; supplier);
+
+    /**
+     * Recovers from a failure by applying a function that returns a new Result.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * Result&amp;lt;User, String&amp;gt; user = findUser(id)
+     *     .recover(error -&amp;gt; findGuestUser());
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param handler function to handle the failure
+     * @return this if success, or the result of the handler
+     */
+    public abstract Result&lt;S, F&gt; recover(Function&lt;? super F, Result&lt;S, F&gt;&gt; handler);
+
+    /**
+     * Validates the success value against a predicate.
+     * If validation fails, produces a failure using the provided function.
+     *
+     * @param predicate condition to test
+     * @param failureProducer produces failure value if predicate fails
+     * @return this if valid, or a failure
+     */
+    public abstract Result&lt;S, F&gt; validate(Function&lt;? super S, Boolean&gt; predicate,
+                                           Function&lt;? super S, ? extends F&gt; failureProducer);
+
+    /**
+     * Performs an action on the value (success or failure) without altering the Result.
+     *
+     * @param observer consumer that receives the value
+     * @return this Result unchanged
+     */
+    public abstract Result&lt;S, F&gt; peek(Consumer&lt;Object&gt; observer);
+
+    /**
+     * Performs an action on the success value if present.
+     *
+     * @param action consumer for the success value
+     * @return this Result unchanged
+     */
+    public abstract Result&lt;S, F&gt; peekSuccess(Consumer&lt;? super S&gt; action);
+
+    /**
+     * Performs an action on the failure value if present.
+     *
+     * @param action consumer for the failure value
+     * @return this Result unchanged
+     */
+    public abstract Result&lt;S, F&gt; peekFailure(Consumer&lt;? super F&gt; action);
+
+    /**
+     * Converts a list of Results into a Result of a list.
+     * Returns the first failure encountered, or a success containing all values.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * List&amp;lt;Result&amp;lt;Integer, String&amp;gt;&amp;gt; results = List.of(
+     *     Result.success(1),
+     *     Result.success(2),
+     *     Result.success(3)
+     * );
+     * Result&amp;lt;List&amp;lt;Integer&amp;gt;, String&amp;gt; combined = Result.sequence(results);
+     * // Success[[1, 2, 3]]
+     *
+     * List&amp;lt;Result&amp;lt;Integer, String&amp;gt;&amp;gt; withFailure = List.of(
+     *     Result.success(1),
+     *     Result.failure(&quot;oops&quot;),
+     *     Result.success(3)
+     * );
+     * Result&amp;lt;List&amp;lt;Integer&amp;gt;, String&amp;gt; failed = Result.sequence(withFailure);
+     * // Failure[oops]
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param &lt;S&gt; the success type
+     * @param &lt;F&gt; the failure type
+     * @param results the list of Results to sequence
+     * @return a Result containing all success values, or the first failure
+     */
+    public static &lt;S, F&gt; Result&lt;List&lt;S&gt;, F&gt; sequence(List&lt;Result&lt;S, F&gt;&gt; results) {
+<span class="fc" id="L266">        List&lt;S&gt; values = new ArrayList&lt;&gt;(results.size());</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">        for (Result&lt;S, F&gt; result : results) {</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">            if (result.isFailure()) {</span>
+<span class="fc" id="L269">                return Result.failure(result.getError());</span>
+            }
+<span class="fc" id="L271">            values.add(result.get());</span>
+<span class="fc" id="L272">        }</span>
+<span class="fc" id="L273">        return Result.success(values);</span>
+    }
+
+    /**
+     * Applies a function to each element and sequences the results.
+     * This is equivalent to mapping each element to a Result and then sequencing.
+     *
+     * &lt;p&gt;Example:&lt;/p&gt;
+     * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+     * List&amp;lt;String&amp;gt; inputs = List.of(&quot;1&quot;, &quot;2&quot;, &quot;3&quot;);
+     * Result&amp;lt;List&amp;lt;Integer&amp;gt;, String&amp;gt; parsed = Result.traverse(inputs, s -&amp;gt; {
+     *     try {
+     *         return Result.success(Integer.parseInt(s));
+     *     } catch (NumberFormatException e) {
+     *         return Result.failure(&quot;Invalid number: &quot; + s);
+     *     }
+     * });
+     * // Success[[1, 2, 3]]
+     *
+     * List&amp;lt;String&amp;gt; mixed = List.of(&quot;1&quot;, &quot;bad&quot;, &quot;3&quot;);
+     * Result&amp;lt;List&amp;lt;Integer&amp;gt;, String&amp;gt; failed = Result.traverse(mixed, s -&amp;gt; ...);
+     * // Failure[Invalid number: bad]
+     * &lt;/code&gt;&lt;/pre&gt;
+     *
+     * @param &lt;T&gt; the input element type
+     * @param &lt;S&gt; the success type
+     * @param &lt;F&gt; the failure type
+     * @param items the list of items to traverse
+     * @param mapper function that converts each item to a Result
+     * @return a Result containing all success values, or the first failure
+     */
+    public static &lt;T, S, F&gt; Result&lt;List&lt;S&gt;, F&gt; traverse(List&lt;T&gt; items, Function&lt;? super T, Result&lt;S, F&gt;&gt; mapper) {
+<span class="fc" id="L305">        List&lt;S&gt; values = new ArrayList&lt;&gt;(items.size());</span>
+<span class="fc bfc" id="L306" title="All 2 branches covered.">        for (T item : items) {</span>
+<span class="fc" id="L307">            Result&lt;S, F&gt; result = mapper.apply(item);</span>
+<span class="fc bfc" id="L308" title="All 2 branches covered.">            if (result.isFailure()) {</span>
+<span class="fc" id="L309">                return Result.failure(result.getError());</span>
+            }
+<span class="fc" id="L311">            values.add(result.get());</span>
+<span class="fc" id="L312">        }</span>
+<span class="fc" id="L313">        return Result.success(values);</span>
+    }
+
+    // --- Success implementation ---
+
+    private static final class Success&lt;S, F&gt; extends Result&lt;S, F&gt; {
+        private final S value;
+
+<span class="fc" id="L321">        Success(S value) {</span>
+<span class="fc" id="L322">            this.value = value;</span>
+<span class="fc" id="L323">        }</span>
+
+        @Override
+        public boolean isSuccess() {
+<span class="fc" id="L327">            return true;</span>
+        }
+
+        @Override
+        public boolean isFailure() {
+<span class="fc" id="L332">            return false;</span>
+        }
+
+        @Override
+        public S get() {
+<span class="fc" id="L337">            return value;</span>
+        }
+
+        @Override
+        public F getError() {
+<span class="fc" id="L342">            throw new IllegalStateException(&quot;Cannot get error from a success Result&quot;);</span>
+        }
+
+        @Override
+        public &lt;R&gt; R fold(Function&lt;? super F, ? extends R&gt; onFailure,
+                          Function&lt;? super S, ? extends R&gt; onSuccess) {
+<span class="fc" id="L348">            return onSuccess.apply(value);</span>
+        }
+
+        @Override
+        public &lt;T&gt; Result&lt;T, F&gt; map(Function&lt;? super S, ? extends T&gt; mapper) {
+<span class="fc" id="L353">            return Result.success(mapper.apply(value));</span>
+        }
+
+        @Override
+        public &lt;T&gt; Result&lt;T, F&gt; flatMap(Function&lt;? super S, Result&lt;T, F&gt;&gt; mapper) {
+<span class="fc" id="L358">            return mapper.apply(value);</span>
+        }
+
+        @Override
+        @SuppressWarnings(&quot;unchecked&quot;)
+        public &lt;E&gt; Result&lt;S, E&gt; mapFailure(Function&lt;? super F, ? extends E&gt; mapper) {
+<span class="fc" id="L364">            return (Result&lt;S, E&gt;) this;</span>
+        }
+
+        @Override
+        public S getOrElse(S defaultValue) {
+<span class="fc" id="L369">            return value;</span>
+        }
+
+        @Override
+        public S getOrElseGet(Supplier&lt;? extends S&gt; supplier) {
+<span class="fc" id="L374">            return value;</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; recover(Function&lt;? super F, Result&lt;S, F&gt;&gt; handler) {
+<span class="fc" id="L379">            return this;</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; validate(Function&lt;? super S, Boolean&gt; predicate,
+                                     Function&lt;? super S, ? extends F&gt; failureProducer) {
+<span class="fc bfc" id="L385" title="All 2 branches covered.">            if (!predicate.apply(value)) {</span>
+<span class="fc" id="L386">                return Result.failure(failureProducer.apply(value));</span>
+            }
+<span class="fc" id="L388">            return this;</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; peek(Consumer&lt;Object&gt; observer) {
+<span class="fc" id="L393">            observer.accept(value);</span>
+<span class="fc" id="L394">            return this;</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; peekSuccess(Consumer&lt;? super S&gt; action) {
+<span class="fc" id="L399">            action.accept(value);</span>
+<span class="fc" id="L400">            return this;</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; peekFailure(Consumer&lt;? super F&gt; action) {
+<span class="fc" id="L405">            return this;</span>
+        }
+
+        @Override
+        public String toString() {
+<span class="fc" id="L410">            return &quot;Success[&quot; + value + &quot;]&quot;;</span>
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+<span class="pc bpc" id="L415" title="1 of 2 branches missed.">            if (this == obj) return true;</span>
+<span class="fc bfc" id="L416" title="All 2 branches covered.">            if (!(obj instanceof Success)) return false;</span>
+<span class="fc" id="L417">            Success&lt;?, ?&gt; other = (Success&lt;?, ?&gt;) obj;</span>
+<span class="pc bpc" id="L418" title="1 of 4 branches missed.">            return value == null ? other.value == null : value.equals(other.value);</span>
+        }
+
+        @Override
+        public int hashCode() {
+<span class="fc bfc" id="L423" title="All 2 branches covered.">            return value == null ? 0 : value.hashCode();</span>
+        }
+    }
+
+    // --- Failure implementation ---
+
+    private static final class Failure&lt;S, F&gt; extends Result&lt;S, F&gt; {
+        private final F error;
+
+<span class="fc" id="L432">        Failure(F error) {</span>
+<span class="fc" id="L433">            this.error = error;</span>
+<span class="fc" id="L434">        }</span>
+
+        @Override
+        public boolean isSuccess() {
+<span class="fc" id="L438">            return false;</span>
+        }
+
+        @Override
+        public boolean isFailure() {
+<span class="fc" id="L443">            return true;</span>
+        }
+
+        @Override
+        public S get() {
+<span class="fc" id="L448">            throw new IllegalStateException(&quot;Cannot get value from a failure Result: &quot; + error);</span>
+        }
+
+        @Override
+        public F getError() {
+<span class="fc" id="L453">            return error;</span>
+        }
+
+        @Override
+        public &lt;R&gt; R fold(Function&lt;? super F, ? extends R&gt; onFailure,
+                          Function&lt;? super S, ? extends R&gt; onSuccess) {
+<span class="fc" id="L459">            return onFailure.apply(error);</span>
+        }
+
+        @Override
+        @SuppressWarnings(&quot;unchecked&quot;)
+        public &lt;T&gt; Result&lt;T, F&gt; map(Function&lt;? super S, ? extends T&gt; mapper) {
+<span class="fc" id="L465">            return (Result&lt;T, F&gt;) this;</span>
+        }
+
+        @Override
+        @SuppressWarnings(&quot;unchecked&quot;)
+        public &lt;T&gt; Result&lt;T, F&gt; flatMap(Function&lt;? super S, Result&lt;T, F&gt;&gt; mapper) {
+<span class="fc" id="L471">            return (Result&lt;T, F&gt;) this;</span>
+        }
+
+        @Override
+        public &lt;E&gt; Result&lt;S, E&gt; mapFailure(Function&lt;? super F, ? extends E&gt; mapper) {
+<span class="fc" id="L476">            return Result.failure(mapper.apply(error));</span>
+        }
+
+        @Override
+        public S getOrElse(S defaultValue) {
+<span class="fc" id="L481">            return defaultValue;</span>
+        }
+
+        @Override
+        public S getOrElseGet(Supplier&lt;? extends S&gt; supplier) {
+<span class="fc" id="L486">            return supplier.get();</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; recover(Function&lt;? super F, Result&lt;S, F&gt;&gt; handler) {
+<span class="fc" id="L491">            return handler.apply(error);</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; validate(Function&lt;? super S, Boolean&gt; predicate,
+                                     Function&lt;? super S, ? extends F&gt; failureProducer) {
+<span class="fc" id="L497">            return this;</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; peek(Consumer&lt;Object&gt; observer) {
+<span class="fc" id="L502">            observer.accept(error);</span>
+<span class="fc" id="L503">            return this;</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; peekSuccess(Consumer&lt;? super S&gt; action) {
+<span class="fc" id="L508">            return this;</span>
+        }
+
+        @Override
+        public Result&lt;S, F&gt; peekFailure(Consumer&lt;? super F&gt; action) {
+<span class="fc" id="L513">            action.accept(error);</span>
+<span class="fc" id="L514">            return this;</span>
+        }
+
+        @Override
+        public String toString() {
+<span class="fc" id="L519">            return &quot;Failure[&quot; + error + &quot;]&quot;;</span>
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+<span class="fc bfc" id="L524" title="All 2 branches covered.">            if (this == obj) return true;</span>
+<span class="fc bfc" id="L525" title="All 2 branches covered.">            if (!(obj instanceof Failure)) return false;</span>
+<span class="fc" id="L526">            Failure&lt;?, ?&gt; other = (Failure&lt;?, ?&gt;) obj;</span>
+<span class="fc bfc" id="L527" title="All 4 branches covered.">            return error == null ? other.error == null : error.equals(other.error);</span>
+        }
+
+        @Override
+        public int hashCode() {
+<span class="fc bfc" id="L532" title="All 2 branches covered.">            return error == null ? 0 : error.hashCode();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

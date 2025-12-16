@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SafeException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script>
+<!-- <!-- terminal-javadocs-injected [coverage] -->
+<link rel="stylesheet" href="../../terminal-styles/terminaljavadocs-coverage.min.css">
+<script src="../../terminal-styles/terminaljavadocs.min.js" defer></script>
+</head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CoreFun</a> &gt; <a href="index.source.html" class="el_package">com.guinetik.corefun</a> &gt; <span class="el_source">SafeException.java</span></div><h1>SafeException.java</h1><pre class="source lang-java linenums">package com.guinetik.corefun;
+
+/**
+ * A runtime exception wrapper for checked exceptions.
+ * &lt;p&gt;
+ * {@code SafeException} provides a way to wrap checked exceptions as unchecked
+ * exceptions, enabling cleaner functional code without excessive try-catch blocks.
+ * It is the standard exception type thrown by the CoreFun library when operations fail.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Design Philosophy&lt;/h2&gt;
+ * &lt;p&gt;
+ * Java's checked exceptions force explicit handling at every call site, which
+ * conflicts with functional programming patterns like streams and lambdas.
+ * {@code SafeException} bridges this gap by allowing checked exceptions to propagate
+ * as unchecked exceptions while preserving the original cause for debugging.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;When to Use&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;Wrapping checked exceptions in lambda expressions&lt;/li&gt;
+ *   &lt;li&gt;Converting library exceptions to application-level exceptions&lt;/li&gt;
+ *   &lt;li&gt;Providing context messages while preserving the original cause&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Example Usage&lt;/h2&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * // Manual wrapping with context
+ * try {
+ *     riskyOperation();
+ * } catch (IOException e) {
+ *     throw new SafeException(&quot;Failed to read file: &quot; + path, e);
+ * }
+ *
+ * // Using the static wrap method (preserves RuntimeExceptions)
+ * try {
+ *     operation();
+ * } catch (Exception e) {
+ *     throw SafeException.wrap(e);  // Returns original if already RuntimeException
+ * }
+ *
+ * // Adding context to any exception
+ * throw SafeException.wrap(&quot;Database query failed&quot;, e);
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+ * @since 0.1.0
+ * @see SafeRunnable
+ * @see SafeCallable
+ * @see SafeExecutor
+ */
+public class SafeException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Creates a SafeException wrapping the given cause.
+     *
+     * @param cause the underlying exception
+     */
+    public SafeException(Throwable cause) {
+<span class="fc" id="L62">        super(cause);</span>
+<span class="fc" id="L63">    }</span>
+
+    /**
+     * Creates a SafeException with a message and cause.
+     *
+     * @param message descriptive message about the error context
+     * @param cause the underlying exception
+     */
+    public SafeException(String message, Throwable cause) {
+<span class="fc" id="L72">        super(message, cause);</span>
+<span class="fc" id="L73">    }</span>
+
+    /**
+     * Creates a SafeException with just a message.
+     *
+     * @param message descriptive message about the error
+     */
+    public SafeException(String message) {
+<span class="fc" id="L81">        super(message);</span>
+<span class="fc" id="L82">    }</span>
+
+    /**
+     * Wraps a checked exception as a SafeException.
+     * If the exception is already a RuntimeException, it is returned as-is.
+     *
+     * @param e the exception to wrap
+     * @return a RuntimeException (either the original or wrapped)
+     */
+    public static RuntimeException wrap(Exception e) {
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (e instanceof RuntimeException) {</span>
+<span class="fc" id="L93">            return (RuntimeException) e;</span>
+        }
+<span class="fc" id="L95">        return new SafeException(e);</span>
+    }
+
+    /**
+     * Wraps a checked exception with a descriptive message.
+     *
+     * @param message context description
+     * @param e the exception to wrap
+     * @return a SafeException wrapping the original
+     */
+    public static SafeException wrap(String message, Exception e) {
+<span class="fc" id="L106">        return new SafeException(message, e);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultComputable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script>
+<!-- <!-- terminal-javadocs-injected [coverage] -->
+<link rel="stylesheet" href="../../terminal-styles/terminaljavadocs-coverage.min.css">
+<script src="../../terminal-styles/terminaljavadocs.min.js" defer></script>
+</head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CoreFun</a> &gt; <a href="index.source.html" class="el_package">com.guinetik.corefun</a> &gt; <span class="el_source">DefaultComputable.java</span></div><h1>DefaultComputable.java</h1><pre class="source lang-java linenums">package com.guinetik.corefun;
+
+/**
+ * Default immutable implementation of {@link Computable}.
+ * &lt;p&gt;
+ * {@code DefaultComputable} provides a simple, thread-safe implementation of the
+ * {@link Computable} interface. The wrapped value is stored as a final field,
+ * ensuring immutability.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Thread Safety&lt;/h2&gt;
+ * &lt;p&gt;
+ * This class is immutable and therefore thread-safe. The wrapped value itself
+ * should also be immutable or thread-safe for the container to be fully thread-safe.
+ * &lt;/p&gt;
+ *
+ * &lt;h2&gt;Usage&lt;/h2&gt;
+ * &lt;p&gt;
+ * Typically, you should use {@link Computable#of(Object)} rather than constructing
+ * this class directly:
+ * &lt;/p&gt;
+ * &lt;pre class=&quot;language-java&quot;&gt;&lt;code&gt;
+ * Computable&amp;lt;String&amp;gt; comp = Computable.of(&quot;value&quot;);  // Preferred
+ * Computable&amp;lt;String&amp;gt; comp2 = new DefaultComputable&amp;lt;&amp;gt;(&quot;value&quot;);  // Also valid
+ * &lt;/code&gt;&lt;/pre&gt;
+ *
+ * @param &lt;T&gt; the type of the value
+ * @author Guinetik &amp;lt;guinetik@gmail.com&amp;gt;
+ * @since 0.1.0
+ * @see Computable
+ */
+public class DefaultComputable&lt;T&gt; implements Computable&lt;T&gt; {
+    private final T value;
+
+    /**
+     * Creates a new DefaultComputable with the given value.
+     *
+     * @param value the value to wrap
+     */
+<span class="fc" id="L40">    public DefaultComputable(T value) {</span>
+<span class="fc" id="L41">        this.value = value;</span>
+<span class="fc" id="L42">    }</span>
+
+    @Override
+    public T getValue() {
+<span class="fc" id="L46">        return value;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L51">        return &quot;Computable[&quot; + value + &quot;]&quot;;</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (this == obj) return true;</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (!(obj instanceof DefaultComputable)) return false;</span>
+<span class="fc" id="L58">        DefaultComputable&lt;?&gt; other = (DefaultComputable&lt;?&gt;) obj;</span>
+<span class="fc bfc" id="L59" title="All 4 branches covered.">        return value == null ? other.value == null : value.equals(other.value);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        return value == null ? 0 : value.hashCode();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
