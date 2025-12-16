@@ -1,5 +1,7 @@
 package com.guinetik.corefun;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -102,7 +104,7 @@ public abstract class Result<S, F> {
      * @return the success value
      * @throws IllegalStateException if this is a failure
      */
-    public abstract S getSuccess();
+    public abstract S get();
 
     /**
      * Gets the failure value. Throws if this is a success.
@@ -110,7 +112,7 @@ public abstract class Result<S, F> {
      * @return the failure value
      * @throws IllegalStateException if this is a success
      */
-    public abstract F getFailure();
+    public abstract F getError();
 
     /**
      * Applies one of two functions depending on the Result state.
@@ -232,6 +234,85 @@ public abstract class Result<S, F> {
      */
     public abstract Result<S, F> peekFailure(Consumer<? super F> action);
 
+    /**
+     * Converts a list of Results into a Result of a list.
+     * Returns the first failure encountered, or a success containing all values.
+     *
+     * <p>Example:</p>
+     * <pre class="language-java"><code>
+     * List&lt;Result&lt;Integer, String&gt;&gt; results = List.of(
+     *     Result.success(1),
+     *     Result.success(2),
+     *     Result.success(3)
+     * );
+     * Result&lt;List&lt;Integer&gt;, String&gt; combined = Result.sequence(results);
+     * // Success[[1, 2, 3]]
+     *
+     * List&lt;Result&lt;Integer, String&gt;&gt; withFailure = List.of(
+     *     Result.success(1),
+     *     Result.failure("oops"),
+     *     Result.success(3)
+     * );
+     * Result&lt;List&lt;Integer&gt;, String&gt; failed = Result.sequence(withFailure);
+     * // Failure[oops]
+     * </code></pre>
+     *
+     * @param <S> the success type
+     * @param <F> the failure type
+     * @param results the list of Results to sequence
+     * @return a Result containing all success values, or the first failure
+     */
+    public static <S, F> Result<List<S>, F> sequence(List<Result<S, F>> results) {
+        List<S> values = new ArrayList<>(results.size());
+        for (Result<S, F> result : results) {
+            if (result.isFailure()) {
+                return Result.failure(result.getError());
+            }
+            values.add(result.get());
+        }
+        return Result.success(values);
+    }
+
+    /**
+     * Applies a function to each element and sequences the results.
+     * This is equivalent to mapping each element to a Result and then sequencing.
+     *
+     * <p>Example:</p>
+     * <pre class="language-java"><code>
+     * List&lt;String&gt; inputs = List.of("1", "2", "3");
+     * Result&lt;List&lt;Integer&gt;, String&gt; parsed = Result.traverse(inputs, s -&gt; {
+     *     try {
+     *         return Result.success(Integer.parseInt(s));
+     *     } catch (NumberFormatException e) {
+     *         return Result.failure("Invalid number: " + s);
+     *     }
+     * });
+     * // Success[[1, 2, 3]]
+     *
+     * List&lt;String&gt; mixed = List.of("1", "bad", "3");
+     * Result&lt;List&lt;Integer&gt;, String&gt; failed = Result.traverse(mixed, s -&gt; ...);
+     * // Failure[Invalid number: bad]
+     * </code></pre>
+     *
+     * @param <T> the input element type
+     * @param <S> the success type
+     * @param <F> the failure type
+     * @param items the list of items to traverse
+     * @param mapper function that converts each item to a Result
+     * @return a Result containing all success values, or the first failure
+     */
+    public static <T, S, F> Result<List<S>, F> traverse(List<T> items, Function<? super T, Result<S, F>> mapper) {
+        List<S> values = new ArrayList<>(items.size());
+        for (T item : items) {
+            Result<S, F> result = mapper.apply(item);
+            if (result.isFailure()) {
+                return Result.failure(result.getError());
+            }
+            values.add(result.get());
+        }
+        return Result.success(values);
+    }
+
     // --- Success implementation ---
 
     private static final class Success<S, F> extends Result<S, F> {
@@ -252,13 +333,13 @@ public abstract class Result<S, F> {
         }
 
         @Override
-        public S getSuccess() {
+        public S get() {
             return value;
         }
 
         @Override
-        public F getFailure() {
-            throw new IllegalStateException("Cannot get failure from a success Result");
+        public F getError() {
+            throw new IllegalStateException("Cannot get error from a success Result");
         }
 
         @Override
@@ -363,12 +444,12 @@ public abstract class Result<S, F> {
         }
 
         @Override
-        public S getSuccess() {
-            throw new IllegalStateException("Cannot get success from a failure Result: " + error);
+        public S get() {
+            throw new IllegalStateException("Cannot get value from a failure Result: " + error);
         }
 
         @Override
-        public F getFailure() {
+        public F getError() {
             return error;
         }
 

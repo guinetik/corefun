@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link SafeCallable}.
  */
 @DisplayName("SafeCallable")
-class SafeCallableTest {
+public class SafeCallableTest {
 
     @Nested
     @DisplayName("call")
@@ -107,7 +107,7 @@ class SafeCallableTest {
             Result<String, Exception> result = callable.toResult();
 
             assertTrue(result.isSuccess());
-            assertEquals("hello", result.getSuccess());
+            assertEquals("hello", result.get());
         }
 
         @Test
@@ -119,7 +119,7 @@ class SafeCallableTest {
             Result<String, Exception> result = callable.toResult();
 
             assertTrue(result.isFailure());
-            assertSame(cause, result.getFailure());
+            assertSame(cause, result.getError());
         }
     }
 
@@ -135,7 +135,7 @@ class SafeCallableTest {
             Result<Integer, String> result = callable.toResultWithMessage();
 
             assertTrue(result.isSuccess());
-            assertEquals(100, result.getSuccess());
+            assertEquals(100, result.get());
         }
 
         @Test
@@ -148,7 +148,7 @@ class SafeCallableTest {
             Result<String, String> result = callable.toResultWithMessage();
 
             assertTrue(result.isFailure());
-            assertEquals("invalid input", result.getFailure());
+            assertEquals("invalid input", result.getError());
         }
 
         @Test
@@ -161,7 +161,7 @@ class SafeCallableTest {
             Result<String, String> result = callable.toResultWithMessage();
 
             assertTrue(result.isFailure());
-            assertEquals("java.lang.NullPointerException", result.getFailure());
+            assertEquals("java.lang.NullPointerException", result.getError());
         }
     }
 

@@ -2,9 +2,7 @@ package com.guinetik.corefun.examples;
 
 import com.guinetik.corefun.Result;
 import com.guinetik.corefun.Try;
-
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
@@ -41,13 +39,15 @@ public class TryExample {
         System.out.println("Parse '42': " + success);
 
         // Failed operation - exception becomes error message
-        Result<Integer, String> failure = Try.of(() -> Integer.parseInt("not-a-number"));
+        Result<Integer, String> failure = Try.of(() ->
+            Integer.parseInt("not-a-number")
+        );
         System.out.println("Parse 'not-a-number': " + failure);
 
         // Chaining with Result operations
         Result<String, String> doubled = Try.of(() -> Integer.parseInt("21"))
-                .map(n -> n * 2)
-                .map(n -> "Result: " + n);
+            .map(n -> n * 2)
+            .map(n -> "Result: " + n);
         System.out.println("Parsed and doubled: " + doubled);
 
         System.out.println();
@@ -60,16 +60,20 @@ public class TryExample {
         System.out.println("--- Try.ofException() ---");
 
         // When you need the actual exception (for logging, stack traces, etc.)
-        Result<Integer, Exception> result = Try.ofException(() -> Integer.parseInt("bad"));
+        Result<Integer, Exception> result = Try.ofException(() ->
+            Integer.parseInt("bad")
+        );
 
         result.peekFailure(ex -> {
-            System.out.println("Exception type: " + ex.getClass().getSimpleName());
+            System.out.println(
+                "Exception type: " + ex.getClass().getSimpleName()
+            );
             System.out.println("Exception message: " + ex.getMessage());
         });
 
         // You can map the exception to your own error type
-        Result<Integer, String> mapped = result.mapFailure(ex ->
-                ex.getClass().getSimpleName() + ": " + ex.getMessage()
+        Result<Integer, String> mapped = result.mapFailure(
+            ex -> ex.getClass().getSimpleName() + ": " + ex.getMessage()
         );
         System.out.println("Mapped error: " + mapped);
 
@@ -84,19 +88,19 @@ public class TryExample {
 
         // Map exceptions to your own error type
         Result<Path, FileError> fileResult = Try.of(
-                () -> Paths.get("/nonexistent/file.txt").toRealPath(),
-                ex -> new FileError(ex.getMessage(), "FILE_NOT_FOUND")
+            () -> Paths.get("/nonexistent/file.txt").toRealPath(),
+            ex -> new FileError(ex.getMessage(), "FILE_NOT_FOUND")
         );
         System.out.println("File operation: " + fileResult);
 
         fileResult.peekFailure(error ->
-                System.out.println("  Error code: " + error.code)
+            System.out.println("  Error code: " + error.code)
         );
 
         // Useful for creating domain-specific errors
         Result<Integer, ApiError> apiResult = Try.of(
-                () -> callExternalApi(),
-                ex -> new ApiError(500, "Service unavailable: " + ex.getMessage())
+            () -> callExternalApi(),
+            ex -> new ApiError(500, "Service unavailable: " + ex.getMessage())
         );
         System.out.println("API call: " + apiResult);
 
@@ -186,10 +190,13 @@ public class TryExample {
 
         // Practical example: configuration with fallback
         String dbHost = Try.getOrDefault(
-                () -> System.getenv("DB_HOST"),
-                "localhost"
+            () -> System.getenv("DB_HOST"),
+            "localhost"
         );
-        System.out.println("DB_HOST (with fallback): " + (dbHost != null ? dbHost : "localhost"));
+        System.out.println(
+            "DB_HOST (with fallback): " +
+                (dbHost != null ? dbHost : "localhost")
+        );
 
         System.out.println();
     }
@@ -209,6 +216,7 @@ public class TryExample {
     }
 
     static class FileError {
+
         final String message;
         final String code;
 
@@ -224,6 +232,7 @@ public class TryExample {
     }
 
     static class ApiError {
+
         final int statusCode;
         final String message;
 

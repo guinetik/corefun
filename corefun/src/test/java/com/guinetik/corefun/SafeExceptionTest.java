@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link SafeException}.
  */
 @DisplayName("SafeException")
-class SafeExceptionTest {
+public class SafeExceptionTest {
 
     @Nested
     @DisplayName("constructors")

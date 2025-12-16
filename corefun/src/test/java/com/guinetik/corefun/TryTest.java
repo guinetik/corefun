@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link Try}.
  */
 @DisplayName("Try")
-class TryTest {
+public class TryTest {
 
     @Nested
     @DisplayName("of (with string error)")
@@ -25,7 +25,7 @@ class TryTest {
             Result<Integer, String> result = Try.of(() -> 42);
 
             assertTrue(result.isSuccess());
-            assertEquals(42, result.getSuccess());
+            assertEquals(42, result.get());
         }
 
         @Test
@@ -36,7 +36,7 @@ class TryTest {
             });
 
             assertTrue(result.isFailure());
-            assertEquals("bad input", result.getFailure());
+            assertEquals("bad input", result.getError());
         }
 
         @Test
@@ -47,7 +47,7 @@ class TryTest {
             });
 
             assertTrue(result.isFailure());
-            assertEquals("java.lang.NullPointerException", result.getFailure());
+            assertEquals("java.lang.NullPointerException", result.getError());
         }
 
         @Test
@@ -58,7 +58,7 @@ class TryTest {
             });
 
             assertTrue(result.isFailure());
-            assertEquals("file not found", result.getFailure());
+            assertEquals("file not found", result.getError());
         }
     }
 
@@ -72,7 +72,7 @@ class TryTest {
             Result<String, Exception> result = Try.ofException(() -> "hello");
 
             assertTrue(result.isSuccess());
-            assertEquals("hello", result.getSuccess());
+            assertEquals("hello", result.get());
         }
 
         @Test
@@ -84,7 +84,7 @@ class TryTest {
             });
 
             assertTrue(result.isFailure());
-            assertSame(original, result.getFailure());
+            assertSame(original, result.getError());
         }
     }
 
@@ -101,7 +101,7 @@ class TryTest {
             );
 
             assertTrue(result.isSuccess());
-            assertEquals(100, result.getSuccess());
+            assertEquals(100, result.get());
         }
 
         @Test
@@ -113,7 +113,7 @@ class TryTest {
             );
 
             assertTrue(result.isFailure());
-            assertEquals(5, result.getFailure()); // "error".length()
+            assertEquals(5, result.getError()); // "error".length()
         }
     }
 
@@ -129,7 +129,7 @@ class TryTest {
             });
 
             assertTrue(result.isSuccess());
-            assertNull(result.getSuccess());
+            assertNull(result.get());
         }
 
         @Test
@@ -140,7 +140,7 @@ class TryTest {
             });
 
             assertTrue(result.isFailure());
-            assertEquals("bad state", result.getFailure());
+            assertEquals("bad state", result.getError());
         }
     }
 
@@ -160,7 +160,7 @@ class TryTest {
             assertEquals(0, counter[0]); // Not executed yet
             Result<Integer, String> result = lazy.get();
             assertEquals(1, counter[0]); // Now executed
-            assertEquals(1, result.getSuccess());
+            assertEquals(1, result.get());
         }
 
         @Test

@@ -1,30 +1,34 @@
 package com.guinetik.corefun;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link SafeExecutor}.
  */
 @DisplayName("SafeExecutor")
-class SafeExecutorTest {
+public class SafeExecutorTest {
 
     /** Helper to create a SafeExecutor that captures log messages */
-    private SafeExecutor captureExecutor(List<String> infos, List<String> errors) {
-        return () -> Loggable.Logger.of(
-            infos::add,
-            s -> {},
-            errors::add,
-            (msg, t) -> errors.add(msg + ": " + t.getClass().getSimpleName())
-        );
+    public SafeExecutor captureExecutor(
+        List<String> infos,
+        List<String> errors
+    ) {
+        return () ->
+            Loggable.Logger.of(
+                infos::add,
+                s -> {},
+                errors::add,
+                (msg, t) ->
+                    errors.add(msg + ": " + t.getClass().getSimpleName())
+            );
     }
 
     @Nested
@@ -154,10 +158,13 @@ class SafeExecutorTest {
         void safelyResult_returnsSuccess() {
             SafeExecutor executor = SafeExecutor.noop();
 
-            Result<Integer, String> result = executor.safelyResult("Parse", () -> 42);
+            Result<Integer, String> result = executor.safelyResult(
+                "Parse",
+                () -> 42
+            );
 
             assertTrue(result.isSuccess());
-            assertEquals(42, result.getSuccess());
+            assertEquals(42, result.get());
         }
 
         @Test
@@ -165,13 +172,16 @@ class SafeExecutorTest {
         void safelyResult_returnsFailure() {
             SafeExecutor executor = SafeExecutor.noop();
 
-            Result<Integer, String> result = executor.safelyResult("Parse",
-                () -> { throw new NumberFormatException("bad number"); }
+            Result<Integer, String> result = executor.safelyResult(
+                "Parse",
+                () -> {
+                    throw new NumberFormatException("bad number");
+                }
             );
 
             assertTrue(result.isFailure());
-            assertTrue(result.getFailure().contains("Parse failed"));
-            assertTrue(result.getFailure().contains("bad number"));
+            assertTrue(result.getError().contains("Parse failed"));
+            assertTrue(result.getError().contains("bad number"));
         }
 
         @Test
@@ -179,12 +189,15 @@ class SafeExecutorTest {
         void safelyResult_usesClassName() {
             SafeExecutor executor = SafeExecutor.noop();
 
-            Result<Integer, String> result = executor.safelyResult("Parse",
-                () -> { throw new NullPointerException(); }
+            Result<Integer, String> result = executor.safelyResult(
+                "Parse",
+                () -> {
+                    throw new NullPointerException();
+                }
             );
 
             assertTrue(result.isFailure());
-            assertTrue(result.getFailure().contains("NullPointerException"));
+            assertTrue(result.getError().contains("NullPointerException"));
         }
 
         @Test
@@ -220,7 +233,11 @@ class SafeExecutorTest {
         @DisplayName("withLogger creates executor with custom logger")
         void withLogger_works() {
             List<String> infos = new ArrayList<>();
-            Loggable.Logger logger = Loggable.Logger.of(infos::add, s -> {}, s -> {});
+            Loggable.Logger logger = Loggable.Logger.of(
+                infos::add,
+                s -> {},
+                s -> {}
+            );
 
             SafeExecutor executor = SafeExecutor.withLogger(logger);
             executor.safely("Test", () -> "result");
@@ -337,6 +354,7 @@ class SafeExecutorTest {
         @DisplayName("service class can implement SafeExecutor")
         void serviceImplementsSafeExecutor() {
             class DataService implements SafeExecutor {
+
                 private final List<String> logs = new ArrayList<>();
 
                 @Override

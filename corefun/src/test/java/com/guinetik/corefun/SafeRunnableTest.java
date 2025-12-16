@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link SafeRunnable}.
  */
 @DisplayName("SafeRunnable")
-class SafeRunnableTest {
+public class SafeRunnableTest {
 
     @Nested
     @DisplayName("run")

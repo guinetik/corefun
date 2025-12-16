@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link Loggable} and {@link Loggable.Logger}.
  */
 @DisplayName("Loggable")
-class LoggableTest {
+public class LoggableTest {
 
     @Nested
     @DisplayName("Logger.of (3 args)")

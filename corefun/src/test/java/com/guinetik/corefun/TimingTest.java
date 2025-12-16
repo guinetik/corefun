@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link Timing}.
  */
 @DisplayName("Timing")
-class TimingTest {
+public class TimingTest {
 
     @Nested
     @DisplayName("timed (Callable)")

@@ -31,13 +31,13 @@ public class ResultExample {
         Result<Integer, String> success = Result.success(42);
         System.out.println("Success: " + success);
         System.out.println("  isSuccess: " + success.isSuccess());
-        System.out.println("  getValue: " + success.getSuccess());
+        System.out.println("  get(): " + success.get());
 
         // Creating a failure
         Result<Integer, String> failure = Result.failure("Something went wrong");
         System.out.println("\nFailure: " + failure);
         System.out.println("  isFailure: " + failure.isFailure());
-        System.out.println("  getError: " + failure.getFailure());
+        System.out.println("  getError(): " + failure.getError());
 
         // Safe value extraction with defaults
         System.out.println("\nSafe extraction:");

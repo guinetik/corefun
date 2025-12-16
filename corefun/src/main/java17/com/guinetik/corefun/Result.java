@@ -1,5 +1,7 @@
 package com.guinetik.corefun;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -40,8 +42,8 @@ public sealed interface Result<S, F> permits Result.Success, Result.Failure {
 
     boolean isSuccess();
     boolean isFailure();
-    S getSuccess();
-    F getFailure();
+    S get();
+    F getError();
 
     <R> R fold(Function<? super F, ? extends R> onFailure,
                Function<? super S, ? extends R> onSuccess);
@@ -62,14 +64,44 @@ public sealed interface Result<S, F> permits Result.Success, Result.Failure {
     Result<S, F> peekFailure(Consumer<? super F> action);
 
     /**
+     * Converts a list of Results into a Result of a list.
+     * Returns the first failure encountered, or a success containing all values.
+     */
+    static <S, F> Result<List<S>, F> sequence(List<Result<S, F>> results) {
+        List<S> values = new ArrayList<>(results.size());
+        for (Result<S, F> result : results) {
+            if (result.isFailure()) {
+                return Result.failure(result.getError());
+            }
+            values.add(result.get());
+        }
+        return Result.success(values);
+    }
+
+    /**
+     * Applies a function to each element and sequences the results.
+     */
+    static <T, S, F> Result<List<S>, F> traverse(List<T> items, Function<? super T, Result<S, F>> mapper) {
+        List<S> values = new ArrayList<>(items.size());
+        for (T item : items) {
+            Result<S, F> result = mapper.apply(item);
+            if (result.isFailure()) {
+                return Result.failure(result.getError());
+            }
+            values.add(result.get());
+        }
+        return Result.success(values);
+    }
+
+    /**
      * Success implementation as a record.
      */
     record Success<S, F>(S value) implements Result<S, F> {
         @Override public boolean isSuccess() { return true; }
         @Override public boolean isFailure() { return false; }
-        @Override public S getSuccess() { return value; }
-        @Override public F getFailure() {
-            throw new IllegalStateException("Cannot get failure from a success Result");
+        @Override public S get() { return value; }
+        @Override public F getError() {
+            throw new IllegalStateException("Cannot get error from a success Result");
         }
 
         @Override
@@ -135,10 +167,10 @@ public sealed interface Result<S, F> permits Result.Success, Result.Failure {
     record Failure<S, F>(F error) implements Result<S, F> {
         @Override public boolean isSuccess() { return false; }
         @Override public boolean isFailure() { return true; }
-        @Override public S getSuccess() {
-            throw new IllegalStateException("Cannot get success from a failure Result: " + error);
+        @Override public S get() {
+            throw new IllegalStateException("Cannot get value from a failure Result: " + error);
         }
-        @Override public F getFailure() { return error; }
+        @Override public F getError() { return error; }
 
         @Override
         public <R> R fold(Function<? super F, ? extends R> onFailure,

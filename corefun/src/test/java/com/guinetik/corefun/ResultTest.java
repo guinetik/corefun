@@ -4,6 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - One assertion per test when practical (though multiple related assertions are fine)
  */
 @DisplayName("Result")
-class ResultTest {
+public class ResultTest {
 
     @Nested
     @DisplayName("Success")
@@ -34,19 +37,19 @@ class ResultTest {
         }
 
         @Test
-        @DisplayName("getSuccess returns the value")
-        void getSuccess_returnsValue() {
+        @DisplayName("get returns the value")
+        void get_returnsValue() {
             Result<String, String> result = Result.success("hello");
 
-            assertEquals("hello", result.getSuccess());
+            assertEquals("hello", result.get());
         }
 
         @Test
-        @DisplayName("getFailure throws on success")
-        void getFailure_throwsOnSuccess() {
+        @DisplayName("getError throws on success")
+        void getError_throwsOnSuccess() {
             Result<String, String> result = Result.success("value");
 
-            assertThrows(IllegalStateException.class, result::getFailure);
+            assertThrows(IllegalStateException.class, result::getError);
         }
 
         @Test
@@ -122,7 +125,7 @@ class ResultTest {
             Result<String, Integer> mapped = result.mapFailure(String::length);
 
             assertTrue(mapped.isSuccess());
-            assertEquals("value", mapped.getSuccess());
+            assertEquals("value", mapped.get());
         }
     }
 
@@ -140,21 +143,21 @@ class ResultTest {
         }
 
         @Test
-        @DisplayName("getFailure returns the error")
-        void getFailure_returnsError() {
+        @DisplayName("getError returns the error")
+        void getError_returnsError() {
             Result<String, String> result = Result.failure("oops");
 
-            assertEquals("oops", result.getFailure());
+            assertEquals("oops", result.getError());
         }
 
         @Test
-        @DisplayName("getSuccess throws on failure")
-        void getSuccess_throwsOnFailure() {
+        @DisplayName("get throws on failure")
+        void get_throwsOnFailure() {
             Result<String, String> result = Result.failure("error");
 
             IllegalStateException ex = assertThrows(
                 IllegalStateException.class,
-                result::getSuccess
+                result::get
             );
             assertTrue(ex.getMessage().contains("error"));
         }
@@ -193,7 +196,7 @@ class ResultTest {
             Result<String, Integer> mapped = result.mapFailure(String::length);
 
             assertTrue(mapped.isFailure());
-            assertEquals(5, mapped.getFailure());
+            assertEquals(5, mapped.getError());
         }
 
         @Test
@@ -243,7 +246,7 @@ class ResultTest {
 
             Result<Integer, String> mapped = result.map(n -> n * 2);
 
-            assertEquals(10, mapped.getSuccess());
+            assertEquals(10, mapped.get());
         }
 
         @Test
@@ -254,7 +257,7 @@ class ResultTest {
             Result<Integer, String> mapped = result.map(n -> n * 2);
 
             assertTrue(mapped.isFailure());
-            assertEquals("error", mapped.getFailure());
+            assertEquals("error", mapped.getError());
         }
 
         @Test
@@ -264,7 +267,7 @@ class ResultTest {
 
             Result<Integer, String> mapped = result.map(String::length);
 
-            assertEquals(5, mapped.getSuccess());
+            assertEquals(5, mapped.get());
         }
     }
 
@@ -281,7 +284,7 @@ class ResultTest {
                 .flatMap(n -> Result.success(n + 5))
                 .flatMap(n -> Result.success(n * 2));
 
-            assertEquals(30, chained.getSuccess());
+            assertEquals(30, chained.get());
         }
 
         @Test
@@ -294,7 +297,7 @@ class ResultTest {
                 .flatMap(n -> Result.success(n * 2)); // never called
 
             assertTrue(chained.isFailure());
-            assertEquals("boom", chained.getFailure());
+            assertEquals("boom", chained.getError());
         }
 
         @Test
@@ -306,7 +309,7 @@ class ResultTest {
                 .flatMap(n -> Result.success(n * 2));
 
             assertTrue(chained.isFailure());
-            assertEquals("initial error", chained.getFailure());
+            assertEquals("initial error", chained.getError());
         }
     }
 
@@ -369,7 +372,7 @@ class ResultTest {
             );
 
             assertTrue(validated.isSuccess());
-            assertEquals(25, validated.getSuccess());
+            assertEquals(25, validated.get());
         }
 
         @Test
@@ -383,7 +386,7 @@ class ResultTest {
             );
 
             assertTrue(validated.isFailure());
-            assertEquals("Too young: 15", validated.getFailure());
+            assertEquals("Too young: 15", validated.getError());
         }
 
         @Test
@@ -397,7 +400,7 @@ class ResultTest {
             );
 
             assertTrue(validated.isFailure());
-            assertEquals("already failed", validated.getFailure());
+            assertEquals("already failed", validated.getError());
         }
     }
 
@@ -415,7 +418,7 @@ class ResultTest {
             );
 
             assertTrue(recovered.isSuccess());
-            assertEquals("recovered", recovered.getSuccess());
+            assertEquals("recovered", recovered.get());
         }
 
         @Test
@@ -428,7 +431,7 @@ class ResultTest {
             );
 
             assertTrue(recovered.isSuccess());
-            assertEquals("original", recovered.getSuccess());
+            assertEquals("original", recovered.get());
         }
     }
 
@@ -529,6 +532,145 @@ class ResultTest {
 
             assertEquals(a, b);
             assertEquals(0, a.hashCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("sequence")
+    class SequenceTests {
+
+        @Test
+        @DisplayName("sequences all successes into success of list")
+        void sequence_allSuccesses() {
+            List<Result<Integer, String>> results = Arrays.asList(
+                Result.success(1),
+                Result.success(2),
+                Result.success(3)
+            );
+
+            Result<List<Integer>, String> sequenced = Result.sequence(results);
+
+            assertTrue(sequenced.isSuccess());
+            assertEquals(Arrays.asList(1, 2, 3), sequenced.get());
+        }
+
+        @Test
+        @DisplayName("returns first failure")
+        void sequence_returnsFirstFailure() {
+            List<Result<Integer, String>> results = Arrays.asList(
+                Result.success(1),
+                Result.failure("first error"),
+                Result.failure("second error"),
+                Result.success(4)
+            );
+
+            Result<List<Integer>, String> sequenced = Result.sequence(results);
+
+            assertTrue(sequenced.isFailure());
+            assertEquals("first error", sequenced.getError());
+        }
+
+        @Test
+        @DisplayName("empty list returns success of empty list")
+        void sequence_emptyList() {
+            List<Result<Integer, String>> results = Collections.emptyList();
+
+            Result<List<Integer>, String> sequenced = Result.sequence(results);
+
+            assertTrue(sequenced.isSuccess());
+            assertTrue(sequenced.get().isEmpty());
+        }
+
+        @Test
+        @DisplayName("single success")
+        void sequence_singleSuccess() {
+            List<Result<String, String>> results = Collections.singletonList(
+                Result.success("only")
+            );
+
+            Result<List<String>, String> sequenced = Result.sequence(results);
+
+            assertTrue(sequenced.isSuccess());
+            assertEquals(Collections.singletonList("only"), sequenced.get());
+        }
+
+        @Test
+        @DisplayName("single failure")
+        void sequence_singleFailure() {
+            List<Result<String, String>> results = Collections.singletonList(
+                Result.failure("oops")
+            );
+
+            Result<List<String>, String> sequenced = Result.sequence(results);
+
+            assertTrue(sequenced.isFailure());
+            assertEquals("oops", sequenced.getError());
+        }
+    }
+
+    @Nested
+    @DisplayName("traverse")
+    class TraverseTests {
+
+        @Test
+        @DisplayName("traverses all items successfully")
+        void traverse_allSucceed() {
+            List<String> inputs = Arrays.asList("1", "2", "3");
+
+            Result<List<Integer>, String> result = Result.traverse(inputs, s -> {
+                try {
+                    return Result.success(Integer.parseInt(s));
+                } catch (NumberFormatException e) {
+                    return Result.failure("Invalid: " + s);
+                }
+            });
+
+            assertTrue(result.isSuccess());
+            assertEquals(Arrays.asList(1, 2, 3), result.get());
+        }
+
+        @Test
+        @DisplayName("returns first failure during traversal")
+        void traverse_returnsFirstFailure() {
+            List<String> inputs = Arrays.asList("1", "bad", "also bad", "4");
+
+            Result<List<Integer>, String> result = Result.traverse(inputs, s -> {
+                try {
+                    return Result.success(Integer.parseInt(s));
+                } catch (NumberFormatException e) {
+                    return Result.failure("Invalid: " + s);
+                }
+            });
+
+            assertTrue(result.isFailure());
+            assertEquals("Invalid: bad", result.getError());
+        }
+
+        @Test
+        @DisplayName("empty list returns success of empty list")
+        void traverse_emptyList() {
+            List<String> inputs = Collections.emptyList();
+
+            Result<List<Integer>, String> result = Result.traverse(inputs,
+                s -> Result.success(Integer.parseInt(s)));
+
+            assertTrue(result.isSuccess());
+            assertTrue(result.get().isEmpty());
+        }
+
+        @Test
+        @DisplayName("traverse with type transformation")
+        void traverse_typeTransformation() {
+            List<Integer> inputs = Arrays.asList(1, 2, 3);
+
+            Result<List<String>, String> result = Result.traverse(inputs,
+                n -> Result.success("Number: " + n));
+
+            assertTrue(result.isSuccess());
+            assertEquals(
+                Arrays.asList("Number: 1", "Number: 2", "Number: 3"),
+                result.get()
+            );
         }
     }
 }

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link Computable} and {@link DefaultComputable}.
  */
 @DisplayName("Computable")
-class ComputableTest {
+public class ComputableTest {
 
     @Nested
     @DisplayName("of (factory)")
